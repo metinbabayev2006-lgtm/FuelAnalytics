@@ -1,0 +1,14 @@
+.app { max-width: 760px; margin: 0 auto; padding: 72px 24px; }
+.eyebrow { color: #8eabc6; font-size: 0.85rem; }
+h1 { margin: 16px 0; font-size: clamp(2.4rem, 8vw, 4rem); letter-spacing: -0.04em; }
+.intro { color: #b5c3d2; font-size: 1.15rem; }
+.connection-card { margin-top: 40px; padding: 28px; border: 1px solid #34465b; border-radius: 16px; background: #172538; }
+h2 { margin-top: 0; font-size: 1.25rem; }
+p { line-height: 1.65; }
+.status { font-weight: 700; }
+.connected { color: #7de2b2; }
+.error { color: #ffb5b5; }
+.loading { color: #e7d496; }
+button { margin-top: 16px; padding: 12px 20px; border: 0; border-radius: 8px; background: #a2e4c5; color: #11251c; font: inherit; cursor: pointer; }
+button:disabled { opacity: 0.6; cursor: wait; }
+button:focus-visible { outline: 3px solid white; outline-offset: 4px; }
