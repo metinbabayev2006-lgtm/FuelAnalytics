@@ -1,0 +1,29 @@
+# Lokale Zugangsdaten
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+
+# Java / Maven (Wrapper-Dateien bleiben versionierbar)
+**/target/
+*.class
+
+# Node / Vite
+**/node_modules/
+**/dist/
+**/coverage/
+*.tsbuildinfo
+
+# Lokale Entwicklungsdateien
+.idea/
+*.iml
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# Lokale Daten und temporäre Ergebnisse
+/data/
+/tmp/
