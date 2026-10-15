@@ -40,5 +40,19 @@ für die erste funktionsfähige Version.
 
 Spring-Boot-Grundgerüst mit Java 21, Spring Boot 4.1.1 und Maven Wrapper wurde
 eingerichtet und erfolgreich auf Port 8080 gestartet.
-Ein eigener Endpunkt `/api/health` wurde ergänzt; Neustart und HTTP-Prüfung stehen aus.
+Der Endpunkt `/api/health` und der Abruf durch das React-Frontend wurden erfolgreich geprüft.
 Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Dienste.
+
+## Datenbankanbindung (15.10.2026)
+
+- PostgreSQL-Container wurde erfolgreich auf 127.0.0.1:5433 geprüft.
+- JDBC, PostgreSQL-Treiber und Flyway im Backend ergänzt.
+- Beim Start aus backend/ wird ../.env als Properties-Datei gelesen;
+  POSTGRES_PASSWORD wird lokal übernommen, ohne Passwort im Quellcode.
+- V1__create_station.sql legt Tankstellen mit UUID, Adresse und Koordinaten an.
+- Maven-Test mit isolierter H2-Datenbank bestanden: Migration und Tabellenzugriff geprüft.
+  Dies ersetzt keine PostgreSQL-Integrationsprüfung.
+- PostgreSQL-Prüfung erfolgreich: Nutzer-Startprotokoll vom 15.10.2026 bestätigt
+  Verbindung zu PostgreSQL 18.6 auf Port 5433, erfolgreiche V1-Migration und
+  Backend-Start auf Port 8080. Die Tabelle station ist zunächst leer.
+- Bereits ausgeführte Migrationen nicht verändern; Änderungen erhalten neue Versionen.
