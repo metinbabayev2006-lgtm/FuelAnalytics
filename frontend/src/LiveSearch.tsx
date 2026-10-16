@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { StationsMap } from './StationsMap'
 import { LocationPicker } from './LocationPicker'
 import { locationLabel } from './location'
 import type { Location } from './location'
 
 type Fuel = 'diesel' | 'e5' | 'e10'
 type Entry = {
-  station: { id: string; name: string; street: string | null; houseNumber: string | null; place: string | null }
+  station: { id: string; name: string; street: string | null; houseNumber: string | null; place: string | null; latitude: number; longitude: number }
   open: boolean
   distanceKm: number
   prices: Partial<Record<Fuel, number>>
@@ -28,6 +29,8 @@ function validResult(value: unknown): value is Result {
     if (!object(entry) || !object(entry.station)) return false
     const station = entry.station
     return typeof station.id === 'string' && typeof station.name === 'string' &&
+      typeof station.latitude === 'number' && Number.isFinite(station.latitude) && Math.abs(station.latitude) <= 90 &&
+      typeof station.longitude === 'number' && Number.isFinite(station.longitude) && Math.abs(station.longitude) <= 180 &&
       ['street', 'houseNumber', 'place'].every(field => station[field] === null || typeof station[field] === 'string') &&
       typeof entry.open === 'boolean' && typeof entry.distanceKm === 'number' && Number.isFinite(entry.distanceKm) && entry.distanceKm >= 0 &&
       object(entry.prices) && Object.entries(entry.prices).every(([fuel, price]) =>
@@ -38,7 +41,7 @@ function validResult(value: unknown): value is Result {
 export function LiveSearch() {
   const [fuel, setFuel] = useState<Fuel>('e10')
   const [sort, setSort] = useState('price')
-  const [result, setResult] = useState<(Result & { searchLabel: string; radiusKm: number }) | null>(null)
+  const [result, setResult] = useState<(Result & { searchLabel: string; radiusKm: number; center: Location }) | null>(null)
   const [location, setLocation] = useState<Location | null>(null)
   const [radiusKm, setRadiusKm] = useState(5)
   const [loading, setLoading] = useState(false)
@@ -78,7 +81,7 @@ export function LiveSearch() {
       }
       const data: unknown = await response.json()
       if (!validResult(data)) throw new Error('Die Suchantwort hat ein unerwartetes Format.')
-      setResult({ ...data, searchLabel, radiusKm: requestedRadius })
+      setResult({ ...data, searchLabel, radiusKm: requestedRadius, center: location })
     } catch (cause) {
       setError(controller.signal.aborted ? 'Die Anfrage wurde abgebrochen oder hat zu lange gedauert.'
         : cause instanceof Error ? cause.message : 'Die Suche ist fehlgeschlagen.')
@@ -89,13 +92,13 @@ export function LiveSearch() {
     }
   }
 
-  const entries = [...(result?.stations ?? [])].sort((a, b) => {
+  const entries = useMemo(() => [...(result?.stations ?? [])].sort((a, b) => {
     if (sort === 'distance') return a.distanceKm - b.distanceKm || a.station.name.localeCompare(b.station.name)
     const aPrice = a.prices[fuel] ?? Infinity
     const bPrice = b.prices[fuel] ?? Infinity
     if (aPrice !== bPrice) return aPrice - bPrice
     return a.distanceKm - b.distanceKm || a.station.name.localeCompare(b.station.name)
-  })
+  }), [result, sort, fuel])
 
   return <section className="connection-card live-card" aria-labelledby="live-title">
     <span className="live-badge">Tankerkönig · echte Daten</span>
@@ -127,6 +130,7 @@ export function LiveSearch() {
       <p role="status">{result.stations.length} Tankstellen · Datenstand: <time dateTime={result.observedAt}>{dateFormat.format(new Date(result.observedAt))}</time> (Berlin)</p>
       {(loading || error) && <p className="loading">Die angezeigten Ergebnisse stammen weiterhin vom oben genannten Datenstand.</p>}
       {result.rejectedStations > 0 && <p className="loading">{result.rejectedStations} ungültige Datensätze wurden verworfen.</p>}
+      <StationsMap entries={entries} fuel={fuel} center={result.center} radiusKm={result.radiusKm} observedAt={result.observedAt} />
       {entries.length === 0 ? <p>Im gewählten Umkreis wurden keine Tankstellen gefunden.</p> : <div className="table-scroll">
         <table>
           <caption>{fuels[fuel]} · Preise in Euro je Liter · Entfernung zum Suchmittelpunkt, keine Fahrstrecke</caption>

@@ -166,3 +166,14 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
 - Frontend-Build und ESLint bestanden. Backend aus IntelliJ neu gestartet.
 - Echte Geocoding-Abfragen für Detmold und Lemgo sowie Trefferwahl, Radiusänderung
   und Zurücksetzen der Auswahl im Browser geprüft. Dabei kein Tankerkönig-Aufruf.
+
+## Interaktive Tankstellenkarte (16.10.2026)
+
+- Leaflet mit OpenStreetMap ergänzt: Preismarkierungen, Tankstellendetails,
+  Suchmittelpunkt, Radiuskreis, Zoom und Rückkehr zum Suchgebiet.
+- Karte und Tabelle verwenden dasselbe Suchergebnis. Kraftstoffwechsel und
+  Kartenbedienung benötigen keinen zusätzlichen Tankerkönig-Abruf.
+- Quellenangabe sichtbar; Kachelfehler werden angezeigt. Hinweise in docs/maps.md.
+- Frontend-Build und ESLint bestanden. Browserprüfung mit 13 Tankstellen in
+  Detmold (5 km, Abruf 17:41:25 Uhr): Kacheln, Marker-Popup, Wechsel E10 zu Diesel
+  und Zoom erfolgreich geprüft. Screenshot lokal unter tmp/map-search.png.
