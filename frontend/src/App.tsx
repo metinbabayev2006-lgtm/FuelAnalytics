@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import { DemoStation } from './DemoStation'
+import { LiveSearch } from './LiveSearch'
 
 type ConnectionState = 'loading' | 'connected' | 'error'
 
 function App() {
   const [connection, setConnection] = useState<ConnectionState>('loading')
   const [attempt, setAttempt] = useState(0)
+  const [lastChecked, setLastChecked] = useState<Date | null>(null)
+  const [completedCheck, setCompletedCheck] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -14,7 +18,10 @@ function App() {
 
     async function checkBackend() {
       try {
-        const response = await fetch('/api/health', { signal: controller.signal })
+        const response = await fetch('/api/health', {
+          signal: controller.signal,
+          cache: 'no-store',
+        })
         if (!response.ok) throw new Error('Backend request failed')
         const data: unknown = await response.json()
         if (typeof data !== 'object' || data === null ||
@@ -27,6 +34,10 @@ function App() {
         if (active) setConnection('error')
       } finally {
         window.clearTimeout(timeout)
+        if (active) {
+          setLastChecked(new Date())
+          setCompletedCheck(attempt + 1)
+        }
       }
     }
 
@@ -43,6 +54,8 @@ function App() {
       <p className="eyebrow">TH OWL · Datenmanagement und Visualisierung</p>
       <h1>FuelAnalytics</h1>
       <p className="intro">Kraftstoffpreise verstehen und vergleichen.</p>
+      <LiveSearch />
+      <details className="secondary-panel"><summary>Synthetische Beispieldaten ansehen</summary><DemoStation /></details>
       <section className="connection-card" aria-labelledby="connection-title">
         <h2 id="connection-title">Verbindung zum Backend</h2>
         <p role="status" className={`status ${connection}`}>
@@ -60,7 +73,15 @@ function App() {
         <button disabled={connection === 'loading'} onClick={() => {
           setConnection('loading')
           setAttempt((value) => value + 1)
-        }}>Erneut prüfen</button>
+        }}>{connection === 'loading' ? 'Wird geprüft …' : 'Erneut prüfen'}</button>
+        <p className="last-checked" aria-live="polite" aria-atomic="true">
+          {lastChecked ? <>
+            Zuletzt geprüft: <time dateTime={lastChecked.toISOString()}>
+              {lastChecked.toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin' })}
+            </time> Uhr (Berlin)
+            {' · '}Prüfung {completedCheck} abgeschlossen
+          </> : 'Noch keine Prüfung abgeschlossen.'}
+        </p>
       </section>
     </main>
   )

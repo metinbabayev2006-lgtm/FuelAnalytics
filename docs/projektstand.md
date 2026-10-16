@@ -56,3 +56,92 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
   Verbindung zu PostgreSQL 18.6 auf Port 5433, erfolgreiche V1-Migration und
   Backend-Start auf Port 8080. Die Tabelle station ist zunächst leer.
 - Bereits ausgeführte Migrationen nicht verändern; Änderungen erhalten neue Versionen.
+- V2__create_price_observation.sql ergänzt Preisbeobachtungen mit Tankstellenbezug,
+  Kraftstoffsorte, positivem Dezimalpreis (drei Nachkommastellen) und Abrufzeitpunkt.
+  Gleiche Tankstelle/Sorte/Zeitpunkt sind eindeutig; dieser Index unterstützt Verläufe.
+  Fehlende Preise werden nicht als Nullpreis gespeichert. Gleiche Preise zu
+  unterschiedlichen Abrufzeiten bleiben eigenständige Beobachtungen.
+- V2 erfolgreich auf PostgreSQL angewendet: Nutzer-Startprotokoll vom 15.10.2026
+  um 21:25 bestätigt Schema-Version 2 und Backend-Start auf Port 8080.
+- Nächster Schritt: V2-Stand in Git sichern, danach Datenzugriff für Tankstellen
+  und Preisbeobachtungen implementieren. API-Key-Freigabe noch nicht bestätigt.
+
+## Java-Datenzugriff (16.10.2026)
+
+- Station als Java-Record mit UUID, Adressfeldern, Koordinaten und UTC-Zeitpunkt ergänzt.
+- StationRepository verwendet JdbcTemplate und parametrisierte SQL-Anweisungen.
+  save legt neue Stationen an; update ändert vorhandene; findById liefert Optional.
+- Sechs Repository-Tests auf isoliertem H2 bestanden: vollständiger Datensatz,
+  optionale Felder, unbekannte ID, Aktualisierung, Update einer unbekannten ID
+  und Zurückweisung doppelter IDs. Alle bestehenden Maven-Tests ebenfalls bestanden.
+- Die Repository-Tests schreiben keine Beispieldaten in die lokale PostgreSQL-Datenbank.
+  Ein eigener PostgreSQL-Repository-Integrationstest steht noch aus.
+- IntelliJ: BackendApplication mit Java 21 und Arbeitsverzeichnis backend eingerichtet;
+  Frontend als npm-Konfiguration mit Skript dev eingerichtet und Verbindung geprüft.
+- Preisbeobachtungen: PriceObservation, FuelType und PriceObservationRepository ergänzt.
+  Speichern und chronologisches Auslesen nach Tankstelle, Sorte und Zeitintervall
+  [von, bis) sind implementiert; Preise verwenden BigDecimal, Zeitpunkte Instant.
+- Sieben neue H2-Repository-Tests bestanden (Sortierung, Filter, Intervallgrenzen,
+  leere Historie, Duplikate, fehlende Tankstelle und ungültiges Intervall).
+  Gesamter Maven-Testlauf erfolgreich. PostgreSQL-Repository-Test weiterhin offen.
+- REST-Schnittstelle ergänzt: GET /api/stations/{id} und
+  GET /api/stations/{id}/prices mit Kraftstoffsorte und Zeitintervall.
+  Details und Fehlercodes stehen in docs/rest-api.md.
+- Lokaler REST-Test nach IntelliJ-Neustart erfolgreich (ungültige UUID: HTTP 400).
+- Synthetische Demo-Tankstelle (UUID 11111111-1111-4111-8111-111111111111)
+  und drei fiktive E10-Preise über docs/demo-data.sql in PostgreSQL eingespielt.
+  Keine echten Marktpreise; Metadaten sind ausdrücklich als Demo gekennzeichnet.
+- React-Komponente DemoStation lädt die synthetische Tankstelle und E10-Beobachtungen
+  über den Vite-Proxy. Anzeige mit drei Preisnachkommastellen, Berliner Uhrzeiten,
+  Demo-Kennzeichnung sowie Lade-, Fehler- und Leerzustand. Zeitraum ist für diese
+  Demo fest auf 16.10.2026 (UTC-Tagesgrenzen) eingestellt.
+- Frontend-Build und ESLint bestanden; beide API-Abfragen über Port 5173 geprüft.
+
+## Tankerkönig-Client (16.10.2026)
+
+- Nutzer hat den persönlichen Schlüssel erhalten und in der ignorierten .env hinterlegt.
+  Vorhandensein ohne Ausgabe des Werts geprüft.
+- Interner TankerkoenigClient ruft list.php mit type=all und sort=dist ab.
+  Radius und Koordinaten werden vor HTTP geprüft. Verbindungs-/Anfrage-Timeouts,
+  Prüfung von ok und stations sowie bereinigte Fehler ohne Schlüssel ergänzt.
+- Mindestabstand 61 Sekunden zwischen Abrufversuchen innerhalb einer Backend-Instanz;
+  keine automatischen Wiederholungen und keine Hintergrundabfragen.
+  Bei Neustarts oder mehreren Instanzen muss die Abfragefrequenz zusätzlich beachtet werden.
+- Fünf Tests gegen lokalen Fake-HTTP-Server und gesamter Maven-Testlauf bestanden.
+  Noch kein echter Tankerkönig-Abruf durchgeführt.
+- Nächster Schritt: einzelne Stations-/Preisfelder validieren, transaktional speichern
+  und einen nutzerinitiierten Suchendpunkt bereitstellen. Client allein persistiert nichts.
+
+## Umkreissuche und Speicherung (16.10.2026)
+
+- POST /api/search ergänzt; Koordinaten und Radius werden vor HTTP geprüft.
+- TankerkoenigMapper validiert UUID, Pflichtfelder, Feldlängen, Koordinaten,
+  Entfernung, Öffnungsstatus und Dezimalpreise; ungültige Stationen werden gezählt.
+- Geschlossene Stationen bleiben im Ergebnis; verfügbare Preise fehlen dort bewusst.
+- SearchResultStore speichert validierte Metadaten und Beobachtungen transaktional.
+  HTTP-Abruf erfolgt vor Beginn der Datenbanktransaktion.
+- Vier Mapper-Tests und zwei H2-Speichertests (einschließlich Rollback) bestanden.
+- Echte API-Abfrage und PostgreSQL-Ende-zu-Ende-Prüfung noch offen.
+- Nächster Schritt: Backend neu starten und eine nutzergewählte Region einmal abrufen.
+
+## Erster Live-Abruf (16.10.2026)
+
+- Nutzer wählte Detmold. Einmaliger Abruf um 17:08:45 Uhr Europe/Berlin,
+  Mittelpunkt 51.93855 / 8.87318, Radius 5 km.
+- HTTP 200, 13 gültige Tankstellen, keine verworfenen Datensätze,
+  39 Preisbeobachtungen (Diesel, E5, E10) gespeichert.
+- Kein weiterer API-Abruf zur Nachprüfung: Speicherung direkt per SQL kontrolliert.
+- Frontend zeigt weiterhin nur synthetische Demodaten; Live-Anzeige folgt separat.
+
+## Live-Oberfläche Detmold (16.10.2026)
+
+- LiveSearch zeigt eine feste Detmold-Umkreissuche (5 km), ausgelöst per Button.
+- Kraftstoffauswahl und Sortierung nach Preis/Entfernung erfolgen lokal ohne HTTP.
+- Abrufzeit, Öffnungsstatus, fehlende Preise, Datenquelle und Lizenz sichtbar.
+- 61-Sekunden-Sperre im Frontend, separate Behandlung von HTTP 429/502/503,
+  Timeout, Lade- und Leerzustand. Vorherige Ergebnisse bleiben bei Fehlern datiert.
+- Synthetische Demo bleibt separat eingeklappt. Ortseingabe und Karte noch offen.
+- Frontend-Build und ESLint bestanden; HTTP-429-Anzeige im Browser geprüft.
+- Browserprüfung erfolgreich: 13 Live-Ergebnisse angezeigt (Abruf 17:12:41 Uhr),
+  Wechsel E10 zu Diesel sowie Sortierung nach Entfernung geprüft; Datenstand
+  blieb dabei unverändert. Darstellung visuell geprüft.

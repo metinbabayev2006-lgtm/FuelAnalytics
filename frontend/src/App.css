@@ -1,4 +1,4 @@
-.app { max-width: 760px; margin: 0 auto; padding: 72px 24px; }
+.app { max-width: 1020px; margin: 0 auto; padding: 72px 24px; }
 .eyebrow { color: #8eabc6; font-size: 0.85rem; }
 h1 { margin: 16px 0; font-size: clamp(2.4rem, 8vw, 4rem); letter-spacing: -0.04em; }
 .intro { color: #b5c3d2; font-size: 1.15rem; }
@@ -9,6 +9,26 @@ p { line-height: 1.65; }
 .connected { color: #7de2b2; }
 .error { color: #ffb5b5; }
 .loading { color: #e7d496; }
+.last-checked { color: #b5c3d2; font-size: 0.875rem; margin-bottom: 0; }
 button { margin-top: 16px; padding: 12px 20px; border: 0; border-radius: 8px; background: #a2e4c5; color: #11251c; font: inherit; cursor: pointer; }
 button:disabled { opacity: 0.6; cursor: wait; }
 button:focus-visible { outline: 3px solid white; outline-offset: 4px; }
+.demo-badge { display: inline-block; padding: 5px 10px; border: 1px solid #95824a; border-radius: 6px; color: #f5dd9d; font-size: 0.8rem; margin-bottom: 18px; }
+.demo-note { color: #b5c3d2; }
+.table-scroll { overflow-x: auto; margin-top: 24px; }
+table { width: 100%; border-collapse: collapse; text-align: left; font-variant-numeric: tabular-nums; }
+caption { text-align: left; color: #b5c3d2; font-size: 0.85rem; padding-bottom: 12px; }
+th, td { padding: 14px 8px; border-bottom: 1px solid #34465b; }
+th:last-child, td:last-child { text-align: right; }
+@media (max-width: 480px) { .app { padding: 36px 16px; } .connection-card { padding: 20px; } }
+.live-badge { display: inline-block; color: #7de2b2; margin-bottom: 18px; font-size: 0.85rem; }
+.search-controls { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 24px; }
+.search-controls label { display: flex; flex-direction: column; gap: 8px; flex: 1 1 200px; }
+select { font: inherit; color: #edf3fa; background: #0e1928; padding: 12px; border: 1px solid #70859f; border-radius: 8px; width: 100%; }
+select:focus-visible { outline: 3px solid #a2e4c5; outline-offset: 3px; }
+.station-address { display: block; color: #b5c3d2; font-size: 0.85rem; padding: 4px 0; }
+.live-card td { vertical-align: top; min-width: 100px; }
+.live-card td:first-child { min-width: 220px; }
+.secondary-panel { margin-top: 28px; }
+summary { cursor: pointer; color: #b5c3d2; padding: 12px 0; }
+a { color: #a2e4c5; }
