@@ -145,3 +145,24 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
 - Browserprüfung erfolgreich: 13 Live-Ergebnisse angezeigt (Abruf 17:12:41 Uhr),
   Wechsel E10 zu Diesel sowie Sortierung nach Entfernung geprüft; Datenstand
   blieb dabei unverändert. Darstellung visuell geprüft.
+
+## Freie Ortssuche: Backend (16.10.2026)
+
+- Open-Meteo Geocoding / GeoNames gewählt, ohne weiteren API-Schlüssel.
+- GET /api/locations?query=Ort liefert bis zu fünf deutsche Orte mit Koordinaten.
+- 24-Stunden-Cache (max. 200 Begriffe), ein externer Abruf pro Sekunde je Instanz,
+  Validierung, Timeouts und Fehlerbehandlung ergänzt.
+- Nutzungsbedingungen und technische Grenzen in docs/geocoding.md dokumentiert.
+- Frontend bleibt bis zum nächsten Schritt auf Detmold festgelegt.
+
+## Freie Ortssuche: Oberfläche (16.10.2026)
+
+- LocationPicker ergänzt: Ort/PLZ eingeben, Suche explizit auslösen und Treffer wählen.
+- LiveSearch verwendet gewählte Koordinaten und Radius (1, 2, 5, 10, 15 oder 25 km).
+- Bearbeitung des Ortsfelds verwirft die bisherige Auswahl; Preisabruf bleibt bis
+  zur erneuten Trefferwahl deaktiviert. Preisabruf sperrt Orts- und Radiusänderungen.
+- Bestehende Ergebnisse behalten Ortsbezeichnung, Radius und Datenstand ihrer Abfrage.
+- Quellenangaben Open-Meteo/GeoNames sichtbar; gleichnamige Treffer zeigen Mittelpunkte.
+- Frontend-Build und ESLint bestanden. Backend aus IntelliJ neu gestartet.
+- Echte Geocoding-Abfragen für Detmold und Lemgo sowie Trefferwahl, Radiusänderung
+  und Zurücksetzen der Auswahl im Browser geprüft. Dabei kein Tankerkönig-Aufruf.
