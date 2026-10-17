@@ -16,11 +16,11 @@ export function PriceChart({ prices }: { prices: Observation[] }) {
     <div className="price-chart" role="group" aria-label={`Preisverlauf mit ${prices.length} Beobachtungen. Exakte Werte stehen in der Tabelle darunter.`}>
       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <LineChart data={data} margin={{ top: 16, right: 24, bottom: 16, left: 4 }} accessibilityLayer>
-          <CartesianGrid stroke="#34465b" strokeDasharray="3 3" />
-          <XAxis dataKey="timestamp" type="number" scale="time" domain={['dataMin', 'dataMax']} tickFormatter={value => tickFormat.format(new Date(Number(value)))} stroke="#b5c3d2" minTickGap={40} />
-          <YAxis domain={['auto', 'auto']} tickFormatter={value => priceFormat.format(Number(value))} stroke="#b5c3d2" width={66} />
-          <Tooltip labelFormatter={value => dateFormat.format(new Date(Number(value)))} formatter={value => [`${priceFormat.format(Number(value))} €/Liter`, 'Preis']} contentStyle={{ background: '#0e1928', border: '1px solid #70859f', color: '#edf3fa' }} />
-          <Line type="linear" dataKey="price" stroke="#a2e4c5" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} isAnimationActive={false} />
+          <CartesianGrid stroke="#e1e7d9" strokeDasharray="3 3" />
+          <XAxis dataKey="timestamp" type="number" scale="time" domain={['dataMin', 'dataMax']} tickFormatter={value => tickFormat.format(new Date(Number(value)))} stroke="#71806a" minTickGap={40} />
+          <YAxis domain={['auto', 'auto']} tickFormatter={value => priceFormat.format(Number(value))} stroke="#71806a" width={66} />
+          <Tooltip labelFormatter={value => dateFormat.format(new Date(Number(value)))} formatter={value => [`${priceFormat.format(Number(value))} €/Liter`, 'Preis']} contentStyle={{ background: '#fff', border: '1px solid #c6d3ba', borderRadius: 8, color: '#263b30', boxShadow: '0 5px 20px #203c1910' }} />
+          <Line type="linear" dataKey="price" stroke="#527444" strokeWidth={2} dot={{ r: 4, fill: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

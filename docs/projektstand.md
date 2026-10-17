@@ -225,3 +225,22 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
 - Architektur und relationales Datenmodell in docs/architektur.md beschrieben.
   Ausgeführte Prüfungen und ausdrücklich offene Abgabepunkte stehen in
   docs/testprotokoll.md. Keine vollständige Abnahme oder Produktionsfreigabe.
+
+## Dashboard-Gestaltung (17.10.2026)
+
+- Neue helle Oberfläche mit dunkelgrüner Navigation, Markenzeichen und
+  Einstieg „Besser tanken. Klarer entscheiden.“; eigenes Favicon und deutscher Seitentitel.
+- Suche in Ort und Suchoptionen gegliedert; Preiskennzahlen als vier Karten.
+  Günstigste Tankstellen zeigen nun auch Adressen zur Unterscheidung gleicher Namen.
+- Karte und scrollbare Tankstellenliste stehen auf großen Bildschirmen nebeneinander,
+  auf kleineren darunter. Verlaufdiagramm und Lade-/Leerzustände visuell angepasst.
+- Navigation zu Suche, Ergebnissen und Verlauf; Skip-Link, sichtbare Fokusmarkierungen,
+  Hinweis zu reduzierter Bewegung und eingeklappte System-/Demobereiche.
+- Browserprüfung bei 1440, 900, 390 und 320 Pixeln: kein horizontaler Seitenüberlauf
+  in den geprüften Zuständen. Bei 1440/390 Pixeln Suche, Preisübersicht, Karten-Popup,
+  Rückkehr zum Suchgebiet, Tankstellenauswahl und Verlauf geprüft. Kraftstoffwechsel
+  und Entfernungssortierung funktionieren weiterhin lokal.
+- Ein Preisabruf für Detmold (13 Tankstellen, 17.10.2026 12:33:55 Uhr Berlin).
+  Vorhandene Preisverläufe verwendet; keine Änderung an Backend oder Datenbankschema.
+- Fünf Frontend-Tests, Build und ESLint bestanden. Vorschauen lokal unter
+  tmp/dashboard-desktop.png und tmp/dashboard-mobile.png.

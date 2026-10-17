@@ -83,3 +83,19 @@ Diese Fälle wurden hier nicht sämtlich erneut ausgeführt.
 
 Historische Daten entstehen derzeit ausschließlich bei manuellen Preisabrufen.
 Es existieren kein Hintergrundsammler, keine Prognose und kein Routing.
+
+## Ergänzung: Dashboard-Gestaltung
+
+Am 17.10.2026 wurde die Oberfläche neu gestaltet. Bei 1440 Pixeln wurden die
+nebeneinander angeordneten Karten- und Listenbereiche, Ortssuche und Auswahl,
+ein expliziter Preisabruf, Marker-Popup sowie der Wechsel in den gespeicherten
+Verlauf geprüft. Bei 390 Pixeln wurden die gestapelte Suche, Preiskennzahlen,
+Karte, Tankstellenliste, Diagramm, Kraftstoffwechsel und Sortierung geprüft.
+Die Daten stammen aus einem einzelnen zusätzlichen Abruf um 12:33:55 Uhr Berlin
+mit 13 Tankstellen in Detmold.
+
+Messung der DOM-Breiten: kein horizontaler Seitenüberlauf bei 1440, 900 und
+390 Pixeln. Ein durch die minimale Body-Breite verursachter Überlauf bei
+320 Pixeln wurde korrigiert und erneut geprüft. Die Breitenprüfung ersetzt
+keine vollständige Prüfung aller Bildschirmgrößen, Browser oder Screenreader.
+Frontend-Tests, Build und ESLint wurden nach den Änderungen erneut ausgeführt.

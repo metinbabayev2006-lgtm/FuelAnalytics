@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { DemoStation } from './DemoStation'
 import { LiveSearch } from './LiveSearch'
+import { Icon } from './Icon'
 
 type ConnectionState = 'loading' | 'connected' | 'error'
 
@@ -50,12 +51,29 @@ function App() {
   }, [attempt])
 
   return (
-    <main className="app">
-      <p className="eyebrow">TH OWL · Datenmanagement und Visualisierung</p>
-      <h1>FuelAnalytics</h1>
-      <p className="intro">Kraftstoffpreise verstehen und vergleichen.</p>
+    <div className="dashboard-shell">
+      <a className="skip-link" href="#main-content">Zum Inhalt springen</a>
+      <aside className="sidebar">
+        <a className="brand" href="#main-content" aria-label="FuelAnalytics Start"><span className="brand-symbol"><Icon name="fuel" /></span><span>Fuel<span className="brand-light">Analytics</span><small>PREISE. MIT PERSPEKTIVE.</small></span></a>
+        <div className="nav-label">DEIN ÜBERBLICK</div>
+        <nav aria-label="Hauptnavigation">
+          <a href="#search-panel"><Icon name="search" />Tankstellen finden<Icon name="arrow" /></a>
+          <a href="#results"><Icon name="map" />Preisvergleich</a>
+          <a href="#history-area"><Icon name="chart" />Preisverlauf</a>
+        </nav>
+        <div className="sidebar-note"><span className="note-icon"><Icon name="layers" /></span><strong>Daten statt Bauchgefühl.</strong><p>Vergleiche Preise in deiner Nähe und entdecke, was sich über die Zeit verändert.</p></div>
+        <div className="sidebar-footer"><span className="project-dot" /> EIN HOCHSCHULPROJEKT<small>TH OWL · Datenmanagement<br />und Visualisierung · WS 26/27</small></div>
+      </aside>
+      <div className="main-column">
+      <header className="topbar"><span>Dashboard <span className="breadcrumb">/ Kraftstoffpreise</span></span><a className={`connection-pill ${connection}`} href="#system-status"><span />{connection === 'connected' ? 'Backend verbunden' : connection === 'loading' ? 'Verbindung prüfen …' : 'Backend offline'}</a></header>
+      <main className="app" id="main-content">
+      <section className="hero" aria-labelledby="page-title">
+        <div><p className="eyebrow"><span /> KRAFTSTOFFPREISE IN DEUTSCHLAND</p><h1 id="page-title">Besser tanken.<br /><span>Klarer entscheiden.</span></h1><p className="intro">Dein nächster Tankstopp, gut informiert.<br className="desktop-break" /> Preise vergleichen. Unterschiede sehen. Entwicklungen verstehen.</p></div>
+        <div className="hero-aside"><Icon name="map" /><span>Deine Umgebung.<br /><strong>Dein Preisvergleich.</strong></span><p>Ein Ort. Drei Kraftstoffe.<br />Alle Ergebnisse auf einen Blick.</p></div>
+      </section>
       <LiveSearch />
-      <details className="secondary-panel"><summary>Synthetische Beispieldaten ansehen</summary><DemoStation /></details>
+      <div className="project-tools"><details className="secondary-panel"><summary>Synthetische Beispieldaten ansehen</summary><DemoStation /></details>
+      <details className="secondary-panel" id="system-status"><summary>Systemstatus & Verbindung</summary>
       <section className="connection-card" aria-labelledby="connection-title">
         <h2 id="connection-title">Verbindung zum Backend</h2>
         <p role="status" className={`status ${connection}`}>
@@ -82,8 +100,10 @@ function App() {
             {' · '}Prüfung {completedCheck} abgeschlossen
           </> : 'Noch keine Prüfung abgeschlossen.'}
         </p>
-      </section>
-    </main>
+      </section></details></div>
+      <footer className="page-footer"><span>FuelAnalytics <span>·</span> Mit Daten besser entscheiden.</span><span>Hochschulprojekt · TH OWL</span></footer>
+      </main></div>
+    </div>
   )
 }
 

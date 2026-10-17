@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { StationsMap } from './StationsMap'
 import { PriceSummary } from './PriceSummary'
+import { Icon } from './Icon'
 import { LocationPicker } from './LocationPicker'
 import { locationLabel } from './location'
 import type { Location } from './location'
@@ -105,13 +106,13 @@ export function LiveSearch() {
     return a.distanceKm - b.distanceKm || a.station.name.localeCompare(b.station.name)
   }), [result, sort, fuel])
 
-  return <section className="connection-card live-card" aria-labelledby="live-title">
-    <span className="live-badge">Tankerkönig · echte Daten</span>
-    <h2 id="live-title">Tankstellen suchen</h2>
-    <p className="demo-note">Wähle einen Ort und den Umkreis. Preise werden auf deinen Klick abgerufen und gespeichert.</p>
+  return <section className="live-card" aria-labelledby="live-title">
+    <div className="search-panel" id="search-panel">
+    <div className="section-heading"><div><p className="section-kicker">01 / DEINE SUCHE</p><h2 id="live-title">Wo möchtest du tanken?</h2></div><span className="live-badge"><span />Daten von Tankerkönig</span></div>
+    <div className="search-workspace">
     <LocationPicker selected={location} onSelect={setLocation} disabled={loading} />
-    <h3>2. Kraftstoffpreise abrufen</h3>
-    <p>{location ? `Ausgewählter Ort: ${locationLabel(location)}` : 'Bitte zuerst einen Ort suchen und einen Treffer auswählen.'}</p>
+    <div className="search-options"><h3><span className="step-number">2</span> Suche eingrenzen</h3>
+    <p className="selection-note">{location ? `Ausgewählt: ${locationLabel(location)}` : 'Wähle zuerst einen passenden Ortstreffer.'}</p>
     <div className="search-controls">
       <label>Suchradius<select disabled={loading} value={radiusKm} onChange={event => setRadiusKm(Number(event.target.value))}>
         {[1, 2, 5, 10, 15, 25].map(radius => <option key={radius} value={radius}>{radius} km</option>)}
@@ -123,38 +124,47 @@ export function LiveSearch() {
         <option value="price">Preis, günstigster zuerst</option><option value="distance">Entfernung, nächste zuerst</option>
       </select></label>
     </div>
-    <button disabled={!location || loading || remaining > 0} onClick={() => void search()}>
+    <button className="search-submit" disabled={!location || loading || remaining > 0} onClick={() => void search()}>
       {loading ? 'Preise werden abgerufen …' : remaining > 0 ? `Erneut möglich in ${remaining} s` : 'Preise abrufen'}
-    </button>
-    <p className="last-checked">Kein automatischer Abruf. Kraftstoffwechsel und Sortierung benötigen keine neue Abfrage.</p>
+      <Icon name="arrow" /></button>
+    <p className="last-checked">Abruf auf Klick. Danach frei vergleichen und sortieren.</p>
+    </div></div>
     {loading && <p role="status">Tankstellen werden abgerufen und in der Datenbank gespeichert …</p>}
     {error && <p role="alert" className="error">{error}</p>}
-    {!result && !loading && !error && <p>Noch keine Live-Abfrage in dieser Ansicht.</p>}
+    </div>
+    <div id="results" className="results-area">
+    {!result && <div className="empty-state"><div className="empty-orbit" aria-hidden="true"><span /><span /><Icon name="fuel" /></div><div><p className="section-kicker">DEIN NÄCHSTER TANKSTOPP</p><h3>Ein guter Preis beginnt<br />mit einem guten Überblick.</h3><p>Wähle oben einen Ort und rufe die Preise ab.<br />Hier erscheinen dein Preisvergleich und die Tankstellenkarte.</p></div><span className="empty-caption">SUCHEN → VERGLEICHEN → ENTSCHEIDEN</span></div>}
     {result && <>
-      <h3>Ergebnisse: {result.searchLabel} · {result.radiusKm} km</h3>
-      <p role="status">{result.stations.length} Tankstellen · Datenstand: <time dateTime={result.observedAt}>{dateFormat.format(new Date(result.observedAt))}</time> (Berlin)</p>
+      <div className="section-heading result-heading"><div><p className="section-kicker">02 / DEIN PREISÜBERBLICK</p><h3>{result.searchLabel} <span className="radius-badge">{result.radiusKm} km Umkreis</span></h3></div><p className="result-count"><strong>{result.stations.length}</strong> Tankstellen gefunden</p></div>
+      <p role="status" className="data-timestamp">Datenstand: <time dateTime={result.observedAt}>{dateFormat.format(new Date(result.observedAt))}</time> (Berlin)</p>
       {(loading || error) && <p className="loading">Die angezeigten Ergebnisse stammen weiterhin vom oben genannten Datenstand.</p>}
       {result.rejectedStations > 0 && <p className="loading">{result.rejectedStations} ungültige Datensätze wurden verworfen.</p>}
       <PriceSummary entries={result.stations} fuel={fuel} />
+      <div className="results-grid">
       <StationsMap entries={entries} fuel={fuel} center={result.center} radiusKm={result.radiusKm} observedAt={result.observedAt} />
-      {entries.length === 0 ? <p>Im gewählten Umkreis wurden keine Tankstellen gefunden.</p> : <div className="table-scroll">
-        <table>
+      <section className="station-panel" aria-labelledby="stations-title"><div className="panel-heading"><div><p className="section-kicker">PREISE IM VERGLEICH</p><h4 id="stations-title">Deine Tankstellen</h4></div><span className="count-badge">{entries.length}</span></div>
+      {entries.length === 0 ? <p>Im gewählten Umkreis wurden keine Tankstellen gefunden.</p> : <div className="table-scroll station-list-scroll">
+        <table className="station-table">
           <caption>{fuels[fuel]} · Preise in Euro je Liter · Entfernung zum Suchmittelpunkt, keine Fahrstrecke</caption>
           <thead><tr><th scope="col">Tankstelle</th><th scope="col">Entfernung</th><th scope="col">Preis (€/Liter)</th></tr></thead>
           <tbody>{entries.map(entry => <tr key={entry.station.id}>
             <td><strong>{entry.station.name}</strong><span className="station-address">{[entry.station.street, entry.station.houseNumber, entry.station.place].filter(Boolean).join(' ')}</span>
-              <span className={entry.open ? 'connected' : 'demo-note'}>{entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'}</span>
-              <button className="history-button" aria-pressed={historyStationId === entry.station.id} onClick={() => setHistoryStationId(entry.station.id)}>Preisverlauf ansehen<span className="sr-only">: {entry.station.name}</span></button></td>
-            <td>{distanceFormat.format(entry.distanceKm)} km</td>
-            <td>{entry.prices[fuel] !== undefined ? priceFormat.format(entry.prices[fuel]!) : 'Nicht verfügbar'}</td>
+              <span className={`station-open ${entry.open ? 'connected' : 'demo-note'}`}>{entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'}</span>
+              <button className="history-button" aria-pressed={historyStationId === entry.station.id} onClick={() => setHistoryStationId(entry.station.id)}><Icon name="chart" />Preisverlauf ansehen<span className="sr-only">: {entry.station.name}</span><Icon name="arrow" /></button></td>
+            <td className="station-distance">{distanceFormat.format(entry.distanceKm)} km</td>
+            <td className="station-price">{entry.prices[fuel] !== undefined ? priceFormat.format(entry.prices[fuel]!) : 'Nicht verfügbar'}</td>
           </tr>)}</tbody>
         </table>
-      </div>}
-      <div><Suspense fallback={<p role="status">Diagramm wird geladen …</p>}>
+      </div>}</section></div>
+    </>}
+    </div>
+      <div id="history-area"><Suspense fallback={<p role="status">Diagramm wird geladen …</p>}>
+        {result && <>
         {result.stations.filter(entry => entry.station.id === historyStationId).map(entry =>
           <PriceHistory key={entry.station.id} station={entry.station} fuel={fuel} observedAt={result.observedAt} />)}
+        </>}
       </Suspense></div>
-    </>}
-    <p className="last-checked">Quelle: <a href="https://creativecommons.tankerkoenig.de/">Tankerkönig / MTS-K</a> · <a href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a>. Preise können sich seit dem Abruf geändert haben.</p>
+      {!historyStationId && <div className="history-placeholder"><Icon name="chart" /><div><h3>Jeder Abruf erzählt ein Stück mehr.</h3><p>Wähle nach deiner Suche bei einer Tankstelle „Preisverlauf ansehen“, um gespeicherte Beobachtungen zu vergleichen.</p></div></div>}
+    <p className="source-footer">Quelle: <a href="https://creativecommons.tankerkoenig.de/">Tankerkönig / MTS-K</a> · <a href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a>. Preise können sich seit dem Abruf geändert haben.</p>
   </section>
 }

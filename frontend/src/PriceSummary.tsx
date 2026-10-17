@@ -16,7 +16,7 @@ export function PriceSummary({ entries, fuel }: { entries: readonly Entry[]; fue
         <div><dt>Höchster Preis</dt><dd>{priceFormat.format(summary.max)} <span>€/Liter</span></dd></div>
         <div><dt>Preisspanne</dt><dd>{priceFormat.format(summary.spread)} <span>€/Liter</span></dd></div>
       </dl>
-      <p><strong>{summary.cheapest.length === 1 ? 'Günstigste Tankstelle' : `${summary.cheapest.length} Tankstellen zum günstigsten Preis`}:</strong> {summary.cheapest.map(station => station.name).join(' · ')}</p>
+      <div className="cheapest-stations"><span>{summary.cheapest.length === 1 ? 'Günstigste Tankstelle' : `${summary.cheapest.length} Tankstellen zum günstigsten Preis`}</span><ul>{summary.cheapest.map(station => <li key={station.id}><strong>{station.name}</strong><span>{[station.street, station.houseNumber, station.place].filter(Boolean).join(' ')}</span></li>)}</ul></div>
       <p className="last-checked">Basis: {summary.count} von {entries.length} gefundenen Tankstellen. Berücksichtigt werden nur beim Abruf geöffnete Tankstellen mit verfügbarem {names[fuel]}-Preis. Der Durchschnitt zählt jede Tankstelle gleich; die Preisspanne ist die Differenz zwischen höchstem und niedrigstem Preis. Es gilt der Datenstand oben.</p>
     </>}
   </section>

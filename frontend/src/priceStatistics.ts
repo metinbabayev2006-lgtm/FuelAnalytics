@@ -1,6 +1,6 @@
 export type Fuel = 'diesel' | 'e5' | 'e10'
 type Entry = {
-  station: { id: string; name: string }
+  station: { id: string; name: string; street?: string | null; houseNumber?: string | null; place?: string | null }
   open: boolean
   prices: Partial<Record<Fuel, number>>
 }
