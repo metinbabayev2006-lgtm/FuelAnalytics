@@ -27,6 +27,8 @@ Routenlinks öffnen Google Maps; Favoriten bleiben lokal im Browser.
 Gespeicherte Verläufe lassen sich als CSV exportieren. Ein Vorführmodus
 zeigt fiktive Daten ohne Preis-API, Datenbank oder externe Kartenkacheln.
 Die Anwendung ist für den lokalen Entwicklungsbetrieb eingerichtet.
+Ortsnamen werden über Open-Meteo/GeoNames, deutsche PLZ über
+Zippopotam.us/GeoNames aufgelöst.
 
 ## Lokal starten (Windows / PowerShell)
 
@@ -196,6 +198,7 @@ unter Erhalt des Volumes.
 - [Tankkostenrechner](docs/tank-costs.md)
 - [Routen, CSV, Favoriten, Standort und Vorführmodus](docs/extensions.md)
 - [Testprotokoll und offene Abgabepunkte](docs/testprotokoll.md)
+- [Gesamttest vom 17.10.2026](docs/abnahme-2026-10-17.md)
 - [Projektfortschritt](docs/projektstand.md)
 
 ## Zugangsdaten und Datenquellen

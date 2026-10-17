@@ -4,6 +4,9 @@ import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
 
 class TankerkoenigClientTests {
     private HttpServer server;
@@ -99,5 +104,20 @@ class TankerkoenigClientTests {
         response = "not JSON";
         assertEquals(502, assertThrows(ResponseStatusException.class,
                 () -> client(token).search(52, 8.9, 5)).getStatusCode().value());
+    }
+
+    @Test
+    void distinguishesTimeoutWithoutLeakingKeyOrRetrying() throws Exception {
+        var http = mock(HttpClient.class);
+        when(http.send(any(HttpRequest.class), org.mockito.ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()))
+                .thenThrow(new HttpTimeoutException("Synthetic URL containing " + token));
+        var client = new TankerkoenigClient(token, endpoint, http, clock::get);
+        var error = assertThrows(ResponseStatusException.class, () -> client.search(52, 8.9, 5));
+        assertEquals(504, error.getStatusCode().value());
+        assertFalse(error.toString().contains(token));
+        assertNull(error.getCause());
+        assertEquals(429, assertThrows(ResponseStatusException.class,
+                () -> client.search(52, 8.9, 5)).getStatusCode().value());
+        verify(http, times(1)).send(any(HttpRequest.class), org.mockito.ArgumentMatchers.<HttpResponse.BodyHandler<String>>any());
     }
 }

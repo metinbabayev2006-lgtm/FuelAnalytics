@@ -192,3 +192,14 @@ Keine neuen echten Preise abgerufen; keine Backend-Änderungen.
   im geprüften Demo-Zustand mit Verlauf und Export. Browserkonsole ohne Fehler.
   Screenshots lokal: tmp/routes-live.png, tmp/csv-export-demo.png und
   tmp/extensions-mobile.png. Kein vollständiger Test aller Geräte/Browser.
+
+## Erneuter Gesamttest mit Befunden und Korrekturen
+
+Der ausführliche [Bericht vom 17.10.2026](abnahme-2026-10-17.md) dokumentiert
+die erneute Prüfung nach Nutzerauftrag. Stand danach: 25 Frontend-Tests,
+46 Standard-Backend-Tests und vier separate PostgreSQL-Tests bestanden,
+Build und ESLint bestanden. Ein tatsächlicher PLZ-Suchfehler wurde behoben;
+Zeitüberschreitungen bei Tankerkönig werden gesondert diagnostiziert.
+Die ursprüngliche externe Abrufstörung war aktuell nicht reproduzierbar.
+Offen bleiben insbesondere echte Geräteortung und tatsächlicher Excel-Import;
+der Bericht unterscheidet Live-Prüfungen und synthetische Prüfungen ausdrücklich.

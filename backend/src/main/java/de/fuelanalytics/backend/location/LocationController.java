@@ -13,8 +13,9 @@ public class LocationController {
 
     @GetMapping("/api/locations")
     public LocationResponse search(@RequestParam String query) {
-        return new LocationResponse(client.search(query), "Open-Meteo / GeoNames",
-                "https://open-meteo.com/en/docs/geocoding-api");
+        boolean postal = LocationClient.isPostalQuery(query);
+        return new LocationResponse(client.search(query), postal ? "Zippopotam.us / GeoNames" : "Open-Meteo / GeoNames",
+                postal ? "https://zippopotam.us/" : "https://open-meteo.com/en/docs/geocoding-api");
     }
 
     public record LocationResponse(List<Location> locations, String source, String sourceUrl) { }

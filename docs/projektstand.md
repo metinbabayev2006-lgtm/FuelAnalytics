@@ -311,3 +311,18 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
   und im Popup geprüft, vorhandener Verlauf mit 18 Messungen angezeigt.
 - Bedienung und Architekturdetails in docs/extensions.md. Browserfreigabe am
   echten Gerät und tatsächlicher Excel-Import bleiben manuelle Abnahmepunkte.
+
+## Gesamttest und PLZ-Korrektur (17.10.2026)
+
+- Gesamtablauf mit Ortsname und nach Korrektur PLZ 32756 geprüft. Live-Abrufe
+  lieferten jeweils 13 Tankstellen; Preisbeobachtungen wurden in PostgreSQL bestätigt.
+- Echter Befund: Open-Meteo fand 32756 nicht. Fünfstellige deutsche PLZ werden
+  nun getrennt über Zippopotam.us/GeoNames aufgelöst, einschließlich führender
+  Null, validiertem Antwortland und PLZ, eigenem ID-Namensraum und Quellenangabe.
+  Der gemeinsame 24-Stunden-Cache und Ein-Sekunden-Abstand bleiben erhalten.
+- Zeitüberschreitungen bei Tankerkönig sind jetzt HTTP 504 mit eigener Meldung.
+  Sichere Diagnosekategorien ohne Schlüssel/URLs/Rohantworten ergänzt.
+- 46 Standard-Backend-Tests und 25 Frontend-Tests bestanden. Vier weitere
+  PostgreSQL-Tests separat bestanden. Build und ESLint erfolgreich.
+- Detaillierte Bedienungsprüfung, CSV-Formatprüfung und Grenzen stehen im
+  neuen Bericht docs/abnahme-2026-10-17.md. Keine Behauptung vollständiger Abnahme.

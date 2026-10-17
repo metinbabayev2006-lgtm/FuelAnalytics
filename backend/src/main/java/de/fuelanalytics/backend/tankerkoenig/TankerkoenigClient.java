@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.LongSupplier;
@@ -12,12 +13,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /** Internal adapter; provider records still require domain validation before storage. */
 @Component
 public class TankerkoenigClient {
+    private static final Logger LOG = LoggerFactory.getLogger(TankerkoenigClient.class);
     private final String apiKey;
     private final URI endpoint;
     private final HttpClient http;
@@ -62,20 +66,30 @@ public class TankerkoenigClient {
         Instant observedAt = Instant.now();
         try {
             var response = http.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) throw providerError();
+            if (response.statusCode() != 200) {
+                LOG.warn("Tankerkönig request failed: upstream_http_status={}", response.statusCode());
+                throw providerError();
+            }
             JsonNode root = json.readTree(response.body());
             if (root == null || !root.isObject() || !root.path("ok").isBoolean() ||
                     !root.path("ok").asBoolean() || !root.path("stations").isArray()) {
+                LOG.warn("Tankerkönig request failed: rejected_or_invalid_response");
                 throw providerError();
             }
             return new SearchResponse(observedAt, root.get("stations"));
+        } catch (HttpTimeoutException error) {
+            LOG.warn("Tankerkönig request failed: timeout");
+            throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT,
+                    "Tankerkönig hat nicht rechtzeitig geantwortet");
         } catch (InterruptedException error) {
+            LOG.warn("Tankerkönig request failed: interrupted");
             Thread.currentThread().interrupt();
             throw providerError();
         } catch (ResponseStatusException error) {
             throw error;
         } catch (Exception error) {
             // Do not propagate exceptions, URLs or provider messages containing the API key.
+            LOG.warn("Tankerkönig request failed: exception_type={}", error.getClass().getSimpleName());
             throw providerError();
         }
     }

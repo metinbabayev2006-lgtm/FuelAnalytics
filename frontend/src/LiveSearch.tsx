@@ -97,6 +97,7 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
           429: 'Das Abfragelimit ist erreicht. Bitte warte mindestens 61 Sekunden und versuche es erneut.',
           503: 'Der Tankerkönig-Schlüssel ist im Backend nicht korrekt eingerichtet.',
           502: 'Tankerkönig ist derzeit nicht erreichbar oder liefert ungültige Daten.',
+          504: 'Tankerkönig hat nicht rechtzeitig geantwortet. Bitte warte den Countdown ab und versuche es erneut. Der Vorführmodus funktioniert unabhängig davon.',
         }
         throw new Error(messages[response.status] ?? 'Die Abfrage oder Speicherung ist fehlgeschlagen. Prüfe das Backend und die Datenbank.')
       }

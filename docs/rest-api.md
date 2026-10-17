@@ -1,7 +1,8 @@
 # REST-API: gespeicherte Daten
 
-Die GET-Endpunkte lesen ausschließlich die eigene Datenbank. Die POST-Umkreissuche
-ruft dagegen den externen Anbieter ab und speichert die validierten Ergebnisse.
+Die GET-Tankstellenendpunkte lesen ausschließlich die eigene Datenbank.
+Die separate GET-Ortsauflösung verwendet externe Geodatenanbieter und einen Cache.
+Die POST-Umkreissuche ruft Tankerkönig ab und speichert validierte Ergebnisse.
 
 ## Aktuelle Umkreissuche (externer Abruf und Speicherung)
 
@@ -24,7 +25,8 @@ Abruf beim Backend-Start. Nur auf ausdrückliche Nutzeraktion aufrufen.
 - Die Koordinaten stammen in der Oberfläche aus der separaten Ortssuche.
   Kraftstoffwahl und Sortierung erfolgen lokal im Frontend.
 - HTTP 400: Eingabefehler; 429: weniger als 61 Sekunden seit der letzten Abfrage;
-  503: fehlender/ungültig formatierter lokaler Schlüssel; 502: ungültige Anbieterantwort.
+  503: fehlender/ungültig formatierter lokaler Schlüssel; 502: Verbindungs-/Antwortfehler;
+  504: Zeitüberschreitung beim Anbieter.
 - Abfrageabstand gilt innerhalb einer Backend-Instanz, auch für fehlgeschlagene
   Abrufversuche. Nicht durch Neustarts oder parallele Instanzen umgehen.
 
@@ -61,6 +63,16 @@ Backend-Neustart nötig.
 `GET /api/locations?query=Detmold`
 
 Liefert bis zu fünf deutsche Ortstreffer mit Koordinaten über Open-Meteo/GeoNames.
+Genau fünfstellige numerische Eingaben (z. B. `32756`, `01067`) werden stattdessen
+über Zippopotam.us/GeoNames aufgelöst. Name und PLZ unterscheiden sich in der
+Quellenangabe und im ID-Namensraum; negative PLZ-IDs sind gültige Auswahl-IDs.
 Die Suchzeichenfolge muss nach dem Trimmen 2 bis 100 Zeichen enthalten.
+Rein numerische Eingaben müssen genau fünfstellig sein.
 Die Antwort enthält `locations`, `source` und `sourceUrl`; es werden keine Preise geladen.
 Caching, Abfragegrenzen und Datenquellen sind in [geocoding.md](geocoding.md) beschrieben.
+
+Bei Preisabrufen unterscheidet das Backend HTTP 504 (Zeitlimit bei Tankerkönig)
+von HTTP 502 (andere Verbindungs-/Antwortfehler). Diagnoseprotokolle enthalten
+nur feste Fehlerkategorien, HTTP-Statuscodes oder Exception-Klassennamen,
+keine API-Schlüssel, Anfrage-URLs, Rohantworten oder Exception-Nachrichten.
+Es gibt weiterhin keine automatischen Wiederholungen; 61 Sekunden Abstand bleiben bestehen.

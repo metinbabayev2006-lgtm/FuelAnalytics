@@ -38,8 +38,9 @@ export function LocationPicker({ selected, onSelect, disabled, locating, onLocat
     try {
       const response = await fetch(`/api/locations?query=${encodeURIComponent(query.trim())}`, { signal: controller.signal })
       if (!response.ok) throw new Error(response.status === 429 ? 'Bitte warte kurz vor der nächsten Ortssuche.'
-        : response.status === 400 ? 'Bitte gib einen Ort oder eine PLZ mit 2 bis 100 Zeichen ein.'
-          : 'Die Ortssuche ist derzeit nicht verfügbar. Bitte versuche es erneut.')
+        : response.status === 400 ? 'Bitte gib einen Ort mit 2 bis 100 Zeichen oder eine fünfstellige deutsche PLZ ein.'
+          : /^[0-9]{5}$/.test(query.trim()) ? 'Der PLZ-Dienst ist nicht erreichbar oder liefert keine gültigen Koordinaten. Bitte suche stattdessen nach dem Ortsnamen.'
+            : 'Die Ortssuche ist derzeit nicht verfügbar. Bitte versuche es erneut.')
       const data: unknown = await response.json()
       if (typeof data !== 'object' || data === null || !('locations' in data) ||
         !Array.isArray(data.locations) || !data.locations.every(isLocation)) throw new Error('Die Ortssuche hat unerwartete Daten geliefert.')
@@ -77,7 +78,7 @@ export function LocationPicker({ selected, onSelect, disabled, locating, onLocat
             </button>
           </li>)}</ul>
         </>}
-        <p className="last-checked">Ortsdaten: <a href="https://open-meteo.com/en/docs/geocoding-api">Open-Meteo</a> / <a href="https://www.geonames.org/">GeoNames</a>. Die Ortssuche ruft noch keine Kraftstoffpreise ab.</p>
+        <p className="last-checked">Ortsnamen: <a href="https://open-meteo.com/en/docs/geocoding-api">Open-Meteo</a> / <a href="https://www.geonames.org/">GeoNames</a>. PLZ: <a href="https://zippopotam.us/">Zippopotam.us</a> / GeoNames. Die Ortssuche ruft noch keine Kraftstoffpreise ab.</p>
       </fieldset>
     </form>
     <LocationButton disabled={disabled || loading} onBusyChange={onLocationBusy} onStart={() => onSelect(null)} onSelect={location => {
