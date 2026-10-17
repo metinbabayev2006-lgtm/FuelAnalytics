@@ -1850,4 +1850,27 @@ input, select, button {
 .history-stat-card dt { font-size: 11px; color: #63735c; }
 .history-stat-card dd { margin: 5px 0 0; font-size: 23px; font-weight: 600; color: #35563b; font-variant-numeric: tabular-nums; }
 .history-stat-card > .last-checked { margin-bottom: 0; }
+.demo-mode-panel { display: flex; gap: 20px; align-items: center; justify-content: space-between; padding: 20px; margin-bottom: 24px; border: 1px solid #d5dfc7; border-radius: 12px; background: #eef3e5; }
+.demo-mode-panel strong { font-size: 13px; }
+.demo-mode-panel p { font-size: 12px; margin: 8px 0 0; max-width: 700px; }
+.demo-mode-panel button { flex-shrink: 0; }
+.demo-mode-panel.active { background: #fff4d6; border-color: #d7b86d; }
+.station-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.route-link { font-size: 11px; font-weight: 600; color: #355c43; text-decoration: underline; text-underline-offset: 3px; }
+.favorite-button { padding: 7px 10px; font-size: 11px; background: #f4f7ed; color: #355c43; border-color: #c9d7bd; }
+.favorite-button[aria-pressed=true] { background: #dfeaca; }
+.favorite-filter { display: flex; align-items: center; gap: 8px; margin: 18px 0; font-size: 12px; }
+.favorite-filter input { width: 18px; height: 18px; accent-color: #527444; }
+.favorites-panel { margin: 16px 0 24px; padding: 18px; border: 1px solid #d8e1cf; border-radius: 10px; background: #fff; }
+.favorites-panel ul { list-style: none; padding: 0; }
+.favorites-panel li { padding: 16px 0; border-top: 1px solid #d8e1cf; font-size: 13px; overflow-wrap: anywhere; }
+.favorites-panel li > span { display: block; margin-top: 5px; font-size: 12px; }
+.favorites-panel button { font-size: 11px; padding: 8px 12px; }
+.location-device { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid #d8e1cf; }
+.location-device button { font-size: 12px; }
+.location-device > p[role=status] { font-size: 12px; }
+.station-map.demo-map { background: repeating-linear-gradient(0deg, transparent, transparent 39px, #d8e2d0 40px), repeating-linear-gradient(90deg, #eef2e7, #eef2e7 39px, #d8e2d0 40px); }
+.history-export { padding: 18px; margin: 18px 0 26px; border: 1px solid #d8e1cf; border-radius: 9px; }
+.history-export > .last-checked { margin-bottom: 0; }
+@media (max-width: 760px) { .demo-mode-panel { align-items: stretch; flex-direction: column; } .station-actions { gap: 8px; } }
 @media (max-width: 600px) { .history-choices { grid-template-columns: 1fr; } .history-picker { padding: 12px; } .history-legend { flex-direction: column; } }

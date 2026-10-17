@@ -32,6 +32,6 @@ export function HistoryPreview() {
     <p className="demo-badge">TESTANSICHT · SYNTHETISCHE DATEN · KEINE ECHTEN PREISE</p>
     <h1>Preisverläufe vergleichen</h1><p>Isolierte UI-Prüfung ohne Anbieter- oder Datenbankabfragen.</p>
     <label>Kraftstoff<select value={fuel} onChange={event => setFuel(event.target.value as Fuel)}><option value="e10">Super E10</option><option value="diesel">Diesel</option><option value="e5">Super E5 (leer)</option></select></label>
-    <PriceHistory station={stations[0]} availableStations={stations} fuel={fuel} observedAt={new Date(base).toISOString()} loadSeries={syntheticLoader} />
+    <PriceHistory station={stations[0]} availableStations={stations} fuel={fuel} observedAt={new Date(base).toISOString()} loadSeries={syntheticLoader} demo />
   </main>
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { routeUrl } from './stationActions'
 
 type MapEntry = {
   station: { id: string; name: string; latitude: number; longitude: number }
@@ -13,12 +14,13 @@ type Props = {
   center: { latitude: number; longitude: number }
   radiusKm: number
   observedAt: string
+  demo?: boolean
 }
 
 const fuelNames = { diesel: 'Diesel', e5: 'Super E5', e10: 'Super E10' }
 const priceFormat = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
 
-export function StationsMap({ entries, fuel, center, radiusKm, observedAt }: Props) {
+export function StationsMap({ entries, fuel, center, radiusKm, observedAt, demo = false }: Props) {
   const container = useRef<HTMLDivElement | null>(null)
   const map = useRef<L.Map | null>(null)
   const markers = useRef<L.LayerGroup | null>(null)
@@ -32,11 +34,13 @@ export function StationsMap({ entries, fuel, center, radiusKm, observedAt }: Pro
     map.current = instance
     markers.current = L.layerGroup().addTo(instance)
     searchArea.current = L.layerGroup().addTo(instance)
+    if (!demo) {
     const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(instance)
     tiles.on('tileerror', () => setTileError(true))
+    }
     const resize = new ResizeObserver(() => instance.invalidateSize())
     resize.observe(container.current)
     return () => {
@@ -46,7 +50,7 @@ export function StationsMap({ entries, fuel, center, radiusKm, observedAt }: Pro
       markers.current = null
       searchArea.current = null
     }
-  }, [])
+  }, [demo])
 
   useEffect(() => {
     const layer = markers.current
@@ -75,9 +79,17 @@ export function StationsMap({ entries, fuel, center, radiusKm, observedAt }: Pro
       const openText = document.createElement('p')
       openText.textContent = entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'
       popup.append(title, priceText, openText)
+      const href = routeUrl(entry.station)
+      if (href && !demo) {
+        const route = document.createElement('a')
+        route.href = href; route.target = '_blank'; route.rel = 'noopener noreferrer'; route.referrerPolicy = 'no-referrer'
+        route.textContent = 'Route zur Tankstelle ↗'
+        route.setAttribute('aria-label', `Route zu ${entry.station.name} in Google Maps (neuer Tab)`)
+        popup.append(route)
+      }
       marker.bindPopup(popup)
     }
-  }, [entries, fuel])
+  }, [entries, fuel, demo])
 
   useEffect(() => {
     if (!map.current || !searchArea.current) return
@@ -89,16 +101,16 @@ export function StationsMap({ entries, fuel, center, radiusKm, observedAt }: Pro
       .bindTooltip('Suchmittelpunkt').addTo(searchArea.current)
     bounds.current = circle.getBounds()
     map.current.fitBounds(bounds.current, { padding: [24, 24], maxZoom: 15 })
-  }, [center.latitude, center.longitude, radiusKm, observedAt])
+  }, [center.latitude, center.longitude, radiusKm, observedAt, demo])
 
   return <section className="map-section" aria-labelledby="map-title">
     <h4 id="map-title">Tankstellen auf der Karte</h4>
     <p className="last-checked">Markierungen zeigen {fuelNames[fuel]} in €/Liter. Anklicken für Details. Der Kreis zeigt den Suchradius, der blaue Punkt den Mittelpunkt.</p>
-    <div ref={container} className="station-map" role="region" aria-label="Interaktive Karte der gefundenen Tankstellen" />
+    <div ref={container} className={`station-map${demo ? ' demo-map' : ''}`} role="region" aria-label={demo ? 'Schematische Karte fiktiver Tankstellen ohne Straßenhintergrund' : 'Interaktive Karte der gefundenen Tankstellen'} />
     {tileError && <p role="status" className="loading">Einige Kartenkacheln konnten nicht geladen werden. Die Tankstellen stehen weiterhin in der Tabelle.</p>}
     <button type="button" onClick={() => { if (bounds.current) map.current?.fitBounds(bounds.current, { padding: [24, 24], maxZoom: 15 }) }}>
       Suchgebiet anzeigen
     </button>
-    <p className="last-checked">— bedeutet: Preis nicht verfügbar. Kartenhintergrund: OpenStreetMap. <a href="https://www.openstreetmap.org/fixthemap">Kartenfehler melden</a>.</p>
+    <p className="last-checked">— bedeutet: Preis nicht verfügbar. {demo ? 'Schematisches Koordinatengitter, keine Straßenkarte. Alle Tankstellen sind fiktiv; es werden keine Kartenkacheln geladen.' : <>Kartenhintergrund: OpenStreetMap. <a href="https://www.openstreetmap.org/fixthemap">Kartenfehler melden</a>. Routenlinks öffnen Google Maps und übermitteln nur die Zielkoordinaten; Startpunkt dort wählen.</>}</p>
   </section>
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { comparisonRows, historyStationLabel, historyStatistics, loadHistorySeries, toggleComparison } from './historyComparison'
 import type { Fuel, HistorySeries, HistoryStation } from './historyComparison'
+import { HistoryExport } from './HistoryExport'
 
 const names = { diesel: 'Diesel', e5: 'Super E5', e10: 'Super E10' }
 const colors = ['#416c3b', '#2866a0', '#a35424']
@@ -63,7 +64,7 @@ export function HistoryStatistics({ series }: { series: HistorySeries[] }) {
   </section>
 }
 
-function HistoryData({ stations, fuel, days, loadSeries }: { stations: HistoryStation[]; fuel: Fuel; days: number; loadSeries: typeof loadHistorySeries }) {
+function HistoryData({ stations, fuel, days, loadSeries, demo }: { stations: HistoryStation[]; fuel: Fuel; days: number; loadSeries: typeof loadHistorySeries; demo: boolean }) {
   const [state, setState] = useState<{ series: HistorySeries[]; from: string; to: string } | null>(null)
   useEffect(() => {
     const controller = new AbortController()
@@ -89,12 +90,13 @@ function HistoryData({ stations, fuel, days, loadSeries }: { stations: HistorySt
           : <p><strong>{entry.station.name}</strong>: {entry.prices.length} Beobachtungen{entry.prices.length === 1 ? ' · Nur ein Messpunkt, noch kein Verlauf.' : ''}</p>}
     </div>)}
     <HistoryStatistics series={state.series} />
+    <HistoryExport series={state.series} fuel={fuel} from={state.from} to={state.to} demo={demo} />
     {hasPrices && <ComparisonChart series={state.series} />}
     {state.series.every(entry => entry.error) && <p>Bitte prüfe das Backend und lade den Verlauf erneut.</p>}
   </>
 }
 
-export function PriceHistory({ station, availableStations, fuel, observedAt, loadSeries = loadHistorySeries }: { station: HistoryStation; availableStations: HistoryStation[]; fuel: Fuel; observedAt: string; loadSeries?: typeof loadHistorySeries }) {
+export function PriceHistory({ station, availableStations, fuel, observedAt, loadSeries = loadHistorySeries, demo = false }: { station: HistoryStation; availableStations: HistoryStation[]; fuel: Fuel; observedAt: string; loadSeries?: typeof loadHistorySeries; demo?: boolean }) {
   const [days, setDays] = useState(7)
   const [attempt, setAttempt] = useState(0)
   const [extraIds, setExtraIds] = useState<string[]>([])
@@ -107,7 +109,7 @@ export function PriceHistory({ station, availableStations, fuel, observedAt, loa
   return <section className="history-section" aria-labelledby="history-title">
     <p className="section-kicker">03 / PREISE IM ZEITVERGLEICH</p>
     <h3 id="history-title" ref={heading} tabIndex={-1}>{stations.length === 1 ? `Preisverlauf: ${station.name}` : `${stations.length} Tankstellen im Preisvergleich`}</h3>
-    <p>{names[fuel]} · Nur gespeicherte Beobachtungen. Das Laden fragt keine neuen Tankerkönig-Preise ab.</p>
+    <p>{names[fuel]} · {demo ? 'DEMO: Alle Messungen sind synthetisch und wurden nicht von Tankerkönig abgerufen.' : 'Nur gespeicherte Beobachtungen. Das Laden fragt keine neuen Tankerkönig-Preise ab.'}</p>
     <fieldset className="history-picker"><legend>Tankstellen vergleichen ({stations.length}/3)</legend>
       <p className="last-checked">Ausgangspunkt: <strong>{historyStationLabel(station)}</strong>. Wähle bis zu zwei weitere Tankstellen aus deinem Suchergebnis.</p>
       <div className="history-choices">{availableStations.filter(candidate => candidate.id !== station.id).map(candidate => <label key={candidate.id}>
@@ -120,7 +122,7 @@ export function PriceHistory({ station, availableStations, fuel, observedAt, loa
       <option value={1}>Letzte 24 Stunden</option><option value={7}>Letzte 7 Tage</option><option value={30}>Letzte 30 Tage</option>
     </select></label></div>
     <button onClick={() => setAttempt(value => value + 1)}>Verlauf neu laden</button>
-    <HistoryData key={`${stations.map(entry => entry.id).join(',')}-${fuel}-${days}-${attempt}-${observedAt}`} stations={stations} fuel={fuel} days={days} loadSeries={loadSeries} />
+    <HistoryData key={`${stations.map(entry => entry.id).join(',')}-${fuel}-${days}-${attempt}-${observedAt}`} stations={stations} fuel={fuel} days={days} loadSeries={loadSeries} demo={demo} />
     <p className="last-checked">Der Beobachtungszeitpunkt ist der Abrufzeitpunkt, nicht der bestätigte Zeitpunkt einer Preisänderung. Unterschiedliche Messzeitpunkte erlauben keinen direkten Preisvergleich für denselben Moment. Historische Daten entstehen erst durch eigene Abrufe.</p>
   </section>
 }

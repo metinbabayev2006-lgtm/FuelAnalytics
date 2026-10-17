@@ -23,6 +23,9 @@ Preisvergleich sowie gespeicherte Preisverläufe als Diagramm und Tabelle.
 Ein Tankkostenrechner vergleicht Füllbeträge für eine frei wählbare Literzahl.
 Bis zu drei Tankstellen lassen sich gemeinsam im Verlaufsdiagramm vergleichen.
 Je Tankstelle werden Minimum, Maximum, Durchschnitt und Messanzahl ausgewertet.
+Routenlinks öffnen Google Maps; Favoriten bleiben lokal im Browser.
+Gespeicherte Verläufe lassen sich als CSV exportieren. Ein Vorführmodus
+zeigt fiktive Daten ohne Preis-API, Datenbank oder externe Kartenkacheln.
 Die Anwendung ist für den lokalen Entwicklungsbetrieb eingerichtet.
 
 ## Lokal starten (Windows / PowerShell)
@@ -113,6 +116,19 @@ lokale Passwort aus `.env`.
    bei Bedarf bis zu zwei weitere Tankstellen aus dem Suchergebnis auswählen.
 5. Im Tankkostenrechner eine Menge zwischen 0,1 und 200 Litern eingeben.
    Füllkosten und Unterschiede erscheinen auch je Tankstelle in der Liste.
+6. „Route zur Tankstelle“ öffnet Google Maps mit dem Ziel; den Startpunkt dort
+   wählen. Links gibt es in Liste, Karten-Popup und Favoriten. Luftlinien in
+   FuelAnalytics sind keine Fahrstrecken. Es werden keine Startkoordinaten angehängt.
+7. Mit „Merken“ Favoriten speichern, unter „Meine Favoriten“ wiederfinden und
+   bei Bedarf Liste/Karte darauf filtern. Keine Preise werden im Browser gespeichert.
+8. Im Verlauf „Preisverlauf als CSV herunterladen“ wählen. Exportiert werden
+   die erfolgreich geladenen Messungen mit UTC-Zeitstempeln und Quellenangabe.
+9. Alternativ „Meinen Standort verwenden“ wählen: Browserzustimmung erforderlich.
+   Erst der anschließende Preisabruf übermittelt die Koordinaten an das Backend
+   und Tankerkönig. Die manuelle Ortssuche bleibt ohne Standortfreigabe verfügbar.
+10. „Vorführmodus starten“ zeigt synthetische Ergebnisse mit Verlauf und Export.
+    Fiktive Tankstellen bieten keine Routen; Demo-Favoriten sind separat gespeichert.
+    Beim Wechsel zur echten Suche werden die Demo-Ergebnisse entfernt.
 
 Live-Preise werden ausschließlich auf Klick abgerufen und dabei gespeichert.
 Zwischen Anbieterabrufen liegen mindestens 61 Sekunden pro Backend-Instanz.
@@ -142,6 +158,18 @@ lokal geprüft. Details und Grenzen: [Testprotokoll](docs/testprotokoll.md).
 `npm run build` erzeugt `frontend/dist`; für eine öffentliche Bereitstellung
 fehlen noch eine gesonderte Betriebs- und Proxy-Konfiguration.
 
+Zusätzliche echte PostgreSQL-Integrationstests starten aus `backend`:
+
+```powershell
+.\Test-Postgres.ps1
+```
+
+Docker Desktop muss laufen. Das Skript verwendet ausschließlich die temporäre
+Testdatenbank auf Port 55433 aus `compose.test.yaml`, führt vier Tests aus und
+beendet den Testcontainer anschließend. Die Anwendungsdatenbank auf 5433 und
+ihr Volume werden nicht verwendet. Beim normalen Maven-Testlauf sind diese
+vier Tests absichtlich deaktiviert. Details: [Erweiterungen](docs/extensions.md).
+
 ## Anhalten und Fehlerbehebung
 
 Backend/Frontend mit IntelliJs Stop-Schaltfläche oder `Ctrl+C` im jeweiligen
@@ -166,6 +194,7 @@ unter Erhalt des Volumes.
 - [Ortssuche](docs/geocoding.md), [Karte](docs/maps.md)
 - [Preisvergleich](docs/price-comparison.md), [Preisverlauf](docs/price-history.md)
 - [Tankkostenrechner](docs/tank-costs.md)
+- [Routen, CSV, Favoriten, Standort und Vorführmodus](docs/extensions.md)
 - [Testprotokoll und offene Abgabepunkte](docs/testprotokoll.md)
 - [Projektfortschritt](docs/projektstand.md)
 

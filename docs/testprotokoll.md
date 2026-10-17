@@ -72,8 +72,8 @@ Diese Fälle wurden hier nicht sämtlich erneut ausgeführt.
    Präsentation mit nachvollziehbarer Vorführung vorbereiten.
 3. Installation auf einer zweiten Umgebung bzw. in einem frischen Test-Volume
    prüfen. Keine vorhandenen Daten für einen Installationstest löschen.
-4. Automatisierte Tests gegen echtes PostgreSQL ergänzen, beispielsweise mit
-   einer isolierten Testdatenbank; H2 deckt nicht jede PostgreSQL-Eigenschaft ab.
+4. PostgreSQL-Integrationstests sind inzwischen ergänzt und separat bestanden
+   (siehe Ergänzung unten). Weiterhin kein vollständiger zweiter Rechner getestet.
 5. Browser-Fehlerfälle für langsame/ausgefallene Dienste, leere und einzelne
    Messreihen sowie kleinere Bildschirmbreiten systematisch ausweiten.
    Tastaturbedienung und Screenreader wurden noch nicht vollständig geprüft.
@@ -158,3 +158,37 @@ E5 ohne Messwerte zeigte keine alten Kennzahlen und keine Nullpreise.
 Bei 390 Pixeln: Seitenbreite 375 Pixel, Kartenbreite 313 Pixel, kein horizontaler
 Seitenüberlauf. Desktopvorschau und schmale Ansicht lokal gespeichert.
 Keine neuen echten Preise abgerufen; keine Backend-Änderungen.
+
+## Ergänzung: Routen, CSV, Favoriten und Vorführung (17.10.2026)
+
+- Frontend: 25 Tests bestanden; Produktionsbuild und ESLint bestanden.
+  Neue Tests prüfen validierte Zielkoordinaten ohne Startpunkt/API-Schlüssel,
+  Favoritenvalidierung/Limit/Metadaten ohne Preise, CSV-Quoting/Dezimalkomma/BOM,
+  Schutz vor Tabellenformeln, Sortierung/Leer-/Teilfehlerfälle und Demo-Verläufe.
+- Standardsuite Backend: 46 Tests erkannt, 42 ausgeführt und bestanden,
+  vier PostgreSQL-Tests absichtlich deaktiviert. Separater Aufruf über
+  `Test-Postgres.ps1`: alle vier PostgreSQL-Integrationstests bestanden.
+  Migrationen V1/V2 auf frischer Testdatenbank, Präzision/UTC-Grenzen,
+  Fremdschlüssel, Duplikate und vollständiger Rollback geprüft. Testcontainer
+  anschließend beendet; produktives lokales Volume unverändert.
+- Browser: Vorführmodus gestartet; vier fiktive Stationen mit schematischer
+  Karte, Preisübersicht, Tankkosten und Verlauf angezeigt. Favorit hinzugefügt,
+  Liste/Karte darauf gefiltert, nach Neuladen und erneutem Einstieg wiedergefunden
+  und entfernt. Beim Rückwechsel waren keine Demo-Favoriten in der echten Suche.
+- CSV mit zwei Demo-Tankstellen: Download-Schaltfläche und Startmeldung geprüft.
+  Serien wurden mit je vier Messungen angezeigt. Serializer automatisiert geprüft;
+  die Speicherung im Downloadordner und ein tatsächlicher Excel-Import wurden
+  in diesem Durchlauf nicht bestätigt.
+- Standort: echte Komponente über `/tests/location-access.html` mit simuliertem
+  Erfolg (Genauigkeit 120 m), Ablehnung, Zeitlimit und fehlender Unterstützung
+  geprüft. Kein echter Standort abgefragt; OS-/Browserfreigabe bleibt ein manueller
+  Abnahmepunkt auf dem Zielgerät.
+- Live-Test: ein Preisabruf für Detmold mit 13 Stationen und Datenstand
+  17.10.2026, 18:07:09 Uhr Berlin. Routenlinks in Liste und Q1-Karten-Popup
+  geprüft. Google Maps öffnete das übergebene Tankstellenziel im Routenplaner;
+  Startpunkt und Fahrstrecke wurden nicht in FuelAnalytics übernommen.
+  Q1-Verlauf mit 18 gespeicherten E10-Messungen geladen, Kennzahlen angezeigt.
+- Bei 390 Pixeln kein horizontaler Seitenüberlauf (Seitenbreite 375 Pixel)
+  im geprüften Demo-Zustand mit Verlauf und Export. Browserkonsole ohne Fehler.
+  Screenshots lokal: tmp/routes-live.png, tmp/csv-export-demo.png und
+  tmp/extensions-mobile.png. Kein vollständiger Test aller Geräte/Browser.

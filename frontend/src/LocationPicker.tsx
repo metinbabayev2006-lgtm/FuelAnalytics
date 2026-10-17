@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { locationLabel, locationPosition } from './location'
 import type { Location } from './location'
+import { LocationButton } from './LocationButton'
 
 function isLocation(value: unknown): value is Location {
   if (typeof value !== 'object' || value === null) return false
@@ -12,9 +13,9 @@ function isLocation(value: unknown): value is Location {
     typeof row.longitude === 'number' && Number.isFinite(row.longitude) && Math.abs(row.longitude) <= 180
 }
 
-type Props = { selected: Location | null; onSelect: (location: Location | null) => void; disabled: boolean }
+type Props = { selected: Location | null; onSelect: (location: Location | null) => void; disabled: boolean; locating: boolean; onLocationBusy: (busy: boolean) => void }
 
-export function LocationPicker({ selected, onSelect, disabled }: Props) {
+export function LocationPicker({ selected, onSelect, disabled, locating, onLocationBusy }: Props) {
   const [query, setQuery] = useState('Detmold')
   const [locations, setLocations] = useState<Location[]>([])
   const [loading, setLoading] = useState(false)
@@ -54,7 +55,7 @@ export function LocationPicker({ selected, onSelect, disabled }: Props) {
 
   return <div className="location-picker">
     <form onSubmit={event => { event.preventDefault(); void searchLocations() }}>
-      <fieldset disabled={disabled}>
+      <fieldset disabled={disabled || locating}>
         <legend>1. Ort auswählen</legend>
         <label htmlFor="place-query">Ort oder Postleitzahl in Deutschland</label>
         <div className="location-input-row">
@@ -79,5 +80,9 @@ export function LocationPicker({ selected, onSelect, disabled }: Props) {
         <p className="last-checked">Ortsdaten: <a href="https://open-meteo.com/en/docs/geocoding-api">Open-Meteo</a> / <a href="https://www.geonames.org/">GeoNames</a>. Die Ortssuche ruft noch keine Kraftstoffpreise ab.</p>
       </fieldset>
     </form>
+    <LocationButton disabled={disabled || loading} onBusyChange={onLocationBusy} onStart={() => onSelect(null)} onSelect={location => {
+      active.current?.abort(); active.current = null
+      setLocations([]); setSearched(false); setError(''); setLoading(false); onSelect(location)
+    }} />
   </div>
 }

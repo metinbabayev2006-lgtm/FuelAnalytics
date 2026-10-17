@@ -291,3 +291,23 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
 - 19 Frontend-Tests sowie Build und ESLint bestanden. Synthetische Browserprüfung
   für drei Stationen, Einzelmessung, Teilfehler und leeren Kraftstoffzustand.
   Bei 390 Pixeln kein horizontaler Seitenüberlauf. Vorschau: tmp/history-statistics.png.
+
+## Routen und ergänzende Projektfunktionen (17.10.2026)
+
+- Google-Maps-Routenlinks in Liste, Karten-Popup und Favoriten. Nur das Ziel
+  wird im Link übergeben; Luftlinie bleibt von externer Fahrstrecke getrennt.
+- Bis zu 50 lokale Favoriten ohne Preise; Filter für aktuelle Liste/Karte und
+  Suche um einen gemerkten Standort. Fehler im Browserspeicher mit Meldung.
+- Standortsuche mit ausdrücklichem Klick und Browserfreigabe; kein Tracking,
+  separater Preisabruf nach Auswahl. Simulierte Erfolgs-/Fehlerfälle geprüft.
+- CSV für geladene Verläufe, UTC-Zeiten, Quellenangabe, Excel-freundliches Format,
+  Formelschutz, Leer-/Teilfehlermeldungen und Kennzeichnung synthetischer Daten.
+- Voller Vorführmodus ohne Preis-API/Datenbank/Kartenkacheln mit fiktiven Stationen,
+  Preisvergleichen, Tankkosten, Verläufen und CSV; echte/Demo-Favoriten getrennt.
+- Vier echte PostgreSQL-Integrationstests in einem separaten temporären Container
+  bestanden. Zusätzlich 42 Standard-Backend-Tests und 25 Frontend-Tests bestanden;
+  Build und ESLint erfolgreich. Details und Grenzen im Testprotokoll.
+- Ein Live-Abruf Detmold (13 Stationen, 18:07:09 Uhr Berlin), Route in Google Maps
+  und im Popup geprüft, vorhandener Verlauf mit 18 Messungen angezeigt.
+- Bedienung und Architekturdetails in docs/extensions.md. Browserfreigabe am
+  echten Gerät und tatsächlicher Excel-Import bleiben manuelle Abnahmepunkte.

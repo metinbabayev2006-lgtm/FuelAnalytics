@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { DemoStation } from './DemoStation'
 import { LiveSearch } from './LiveSearch'
 import { Icon } from './Icon'
 
@@ -72,7 +71,7 @@ function App() {
         <div className="hero-aside"><Icon name="map" /><span>Deine Umgebung.<br /><strong>Dein Preisvergleich.</strong></span><p>Ein Ort. Drei Kraftstoffe.<br />Alle Ergebnisse auf einen Blick.</p></div>
       </section>
       <LiveSearch />
-      <div className="project-tools"><details className="secondary-panel"><summary>Synthetische Beispieldaten ansehen</summary><DemoStation /></details>
+      <div className="project-tools">
       <details className="secondary-panel" id="system-status"><summary>Systemstatus & Verbindung</summary>
       <section className="connection-card" aria-labelledby="connection-title">
         <h2 id="connection-title">Verbindung zum Backend</h2>
