@@ -177,3 +177,21 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
 - Frontend-Build und ESLint bestanden. Browserprüfung mit 13 Tankstellen in
   Detmold (5 km, Abruf 17:41:25 Uhr): Kacheln, Marker-Popup, Wechsel E10 zu Diesel
   und Zoom erfolgreich geprüft. Screenshot lokal unter tmp/map-search.png.
+
+## Preisverlaufsdiagramm (17.10.2026)
+
+- Ergebnisliste um Tankstellenauswahl für den Preisverlauf erweitert.
+- Recharts-Diagramm mit zeitproportionaler Achse, Tooltip und ergänzender
+  Messwerttabelle; Minimum, Maximum und Anzahl der gespeicherten Beobachtungen.
+- Kraftstoff aus der Suche sowie Zeiträume 24 Stunden, 7 und 30 Tage.
+  Datenbankabruf über bestehende REST-API; kein zusätzlicher Tankerkönig-Aufruf
+  beim Laden des Verlaufs oder Wechseln der Auswahl.
+- Lade-, Fehler- und Leerzustände sowie Hinweis bei nur einer Beobachtung.
+  Alte Anfragen werden beim Auswahlwechsel abgebrochen. Diagrammbibliothek
+  wird erst bei Bedarf geladen. Grenzen der Messdaten sichtbar erläutert.
+- Build, TypeScript und ESLint bestanden. Browserprüfung mit PostgreSQL:
+  sieben Beobachtungen je ausgewählter Tankstelle, Tankstellenwechsel,
+  E10/Diesel-Wechsel, Zeitraumwechsel und aufklappbare Messwerttabelle geprüft.
+  Ein Live-Abruf für Detmold mit 13 Tankstellen am 17.10.2026 um 12:05:06 Uhr.
+- Technische Hinweise in docs/price-history.md; lokale Vorschau unter
+  tmp/price-history.png. Docker, Backend (8080) und Frontend (5173) gestartet.

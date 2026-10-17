@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { StationsMap } from './StationsMap'
 import { LocationPicker } from './LocationPicker'
 import { locationLabel } from './location'
 import type { Location } from './location'
+
+const PriceHistory = lazy(() => import('./PriceHistory').then(module => ({ default: module.PriceHistory })))
 
 type Fuel = 'diesel' | 'e5' | 'e10'
 type Entry = {
@@ -41,6 +43,7 @@ function validResult(value: unknown): value is Result {
 export function LiveSearch() {
   const [fuel, setFuel] = useState<Fuel>('e10')
   const [sort, setSort] = useState('price')
+  const [historyStationId, setHistoryStationId] = useState<string | null>(null)
   const [result, setResult] = useState<(Result & { searchLabel: string; radiusKm: number; center: Location }) | null>(null)
   const [location, setLocation] = useState<Location | null>(null)
   const [radiusKm, setRadiusKm] = useState(5)
@@ -82,6 +85,7 @@ export function LiveSearch() {
       const data: unknown = await response.json()
       if (!validResult(data)) throw new Error('Die Suchantwort hat ein unerwartetes Format.')
       setResult({ ...data, searchLabel, radiusKm: requestedRadius, center: location })
+      setHistoryStationId(null)
     } catch (cause) {
       setError(controller.signal.aborted ? 'Die Anfrage wurde abgebrochen oder hat zu lange gedauert.'
         : cause instanceof Error ? cause.message : 'Die Suche ist fehlgeschlagen.')
@@ -137,12 +141,17 @@ export function LiveSearch() {
           <thead><tr><th scope="col">Tankstelle</th><th scope="col">Entfernung</th><th scope="col">Preis (€/Liter)</th></tr></thead>
           <tbody>{entries.map(entry => <tr key={entry.station.id}>
             <td><strong>{entry.station.name}</strong><span className="station-address">{[entry.station.street, entry.station.houseNumber, entry.station.place].filter(Boolean).join(' ')}</span>
-              <span className={entry.open ? 'connected' : 'demo-note'}>{entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'}</span></td>
+              <span className={entry.open ? 'connected' : 'demo-note'}>{entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'}</span>
+              <button className="history-button" aria-pressed={historyStationId === entry.station.id} onClick={() => setHistoryStationId(entry.station.id)}>Preisverlauf ansehen<span className="sr-only">: {entry.station.name}</span></button></td>
             <td>{distanceFormat.format(entry.distanceKm)} km</td>
             <td>{entry.prices[fuel] !== undefined ? priceFormat.format(entry.prices[fuel]!) : 'Nicht verfügbar'}</td>
           </tr>)}</tbody>
         </table>
       </div>}
+      <div><Suspense fallback={<p role="status">Diagramm wird geladen …</p>}>
+        {result.stations.filter(entry => entry.station.id === historyStationId).map(entry =>
+          <PriceHistory key={entry.station.id} station={entry.station} fuel={fuel} observedAt={result.observedAt} />)}
+      </Suspense></div>
     </>}
     <p className="last-checked">Quelle: <a href="https://creativecommons.tankerkoenig.de/">Tankerkönig / MTS-K</a> · <a href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a>. Preise können sich seit dem Abruf geändert haben.</p>
   </section>
