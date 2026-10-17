@@ -195,3 +195,18 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
   Ein Live-Abruf für Detmold mit 13 Tankstellen am 17.10.2026 um 12:05:06 Uhr.
 - Technische Hinweise in docs/price-history.md; lokale Vorschau unter
   tmp/price-history.png. Docker, Backend (8080) und Frontend (5173) gestartet.
+
+## Preisübersicht der Suchergebnisse (17.10.2026)
+
+- Günstigster Preis, arithmetischer Durchschnitt, höchster Preis und Preisspanne
+  für den ausgewählten Kraftstoff oberhalb der Karte ergänzt.
+- Grundlage sichtbar erläutert: nur beim Abruf geöffnete Tankstellen mit
+  verfügbarem Preis; Zahl berücksichtigter Ergebnisse und Preisgleichstände.
+- Lokale Berechnung ohne zusätzliche Anbieteranfrage beim Kraftstoffwechsel.
+- Fünf automatisierte Tests mit synthetischen Daten prüfen Filterung, leere
+  Ergebnisse, Einzelpreise, Preisgleichstände, Genauigkeit und Kraftstoffwechsel.
+  Ausführen mit npm test im frontend-Ordner (Node.js 24).
+- Tests, Build und ESLint bestanden. Im Browser E10/Diesel anhand von 13
+  Detmolder Tankstellen geprüft, Datenstand 17.10.2026 12:09:56 Uhr Berlin.
+- Berechnungsdefinitionen in docs/price-comparison.md, lokale Vorschau unter
+  tmp/price-comparison.png.

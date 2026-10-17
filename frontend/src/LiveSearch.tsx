@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { StationsMap } from './StationsMap'
+import { PriceSummary } from './PriceSummary'
 import { LocationPicker } from './LocationPicker'
 import { locationLabel } from './location'
 import type { Location } from './location'
@@ -134,6 +135,7 @@ export function LiveSearch() {
       <p role="status">{result.stations.length} Tankstellen · Datenstand: <time dateTime={result.observedAt}>{dateFormat.format(new Date(result.observedAt))}</time> (Berlin)</p>
       {(loading || error) && <p className="loading">Die angezeigten Ergebnisse stammen weiterhin vom oben genannten Datenstand.</p>}
       {result.rejectedStations > 0 && <p className="loading">{result.rejectedStations} ungültige Datensätze wurden verworfen.</p>}
+      <PriceSummary entries={result.stations} fuel={fuel} />
       <StationsMap entries={entries} fuel={fuel} center={result.center} radiusKm={result.radiusKm} observedAt={result.observedAt} />
       {entries.length === 0 ? <p>Im gewählten Umkreis wurden keine Tankstellen gefunden.</p> : <div className="table-scroll">
         <table>
