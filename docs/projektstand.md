@@ -264,3 +264,18 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
   erfolgreich: 13 Tankstellen Detmold, 17.10.2026 13:04:58 Uhr Berlin.
   Beträge für 40/35,5 Liter sowie Tabellenunterschiede und E10/Diesel geprüft.
 - Details in docs/tank-costs.md, lokale Vorschau unter tmp/tank-costs.png.
+
+## Vergleich mehrerer Preisverläufe (17.10.2026)
+
+- Bis zu drei Tankstellen aus demselben Suchergebnis mit gemeinsamen Zeitachsen,
+  unterschiedlichen Farben und Linienmustern sowie einer Messwerttabelle.
+- Ausgangstankstelle plus zwei optionale Checkboxen; Auswahlbegrenzung und Reset.
+  Kraftstoffwechsel, Zeitraum und Neuladen verwenden gespeicherte Daten.
+- Keine Auffüllung fehlender Werte und keine Rangfolge aus zeitversetzten Preisen.
+  Ladefehler, leere Verläufe und Einzelpunkte werden je Tankstelle angezeigt.
+- 17 Frontend-Tests, Build und ESLint bestanden. Isolierte Browserprüfung mit
+  synthetischen Daten: drei Stationen, Begrenzung, Reset, Teilfehler, leere Daten,
+  Kraftstoff-/Zeitraumwechsel, Neuladen und Messwerttabelle.
+- Bei 390 Pixeln kein horizontaler Seitenüberlauf, auch mit geöffneter Tabelle.
+  Vorschauen: tmp/history-comparison.png und tmp/history-comparison-mobile.png.
+  Für diese Funktion keine neuen Live-Preise abgerufen; Backend unverändert.

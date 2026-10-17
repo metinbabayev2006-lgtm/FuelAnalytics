@@ -111,6 +111,7 @@ export function LiveSearch() {
   }), [result, sort, fuel])
 
   const comparison = useMemo(() => summarizePrices(result?.stations ?? [], fuel), [result, fuel])
+  const historyStations = useMemo(() => result?.stations.map(entry => entry.station) ?? [], [result])
   const tankVolume = parseTankVolume(tankAmount)
   const cheapestFill = comparison ? fillCostCents(comparison.min, tankVolume) : null
 
@@ -170,7 +171,7 @@ export function LiveSearch() {
       <div id="history-area"><Suspense fallback={<p role="status">Diagramm wird geladen …</p>}>
         {result && <>
         {result.stations.filter(entry => entry.station.id === historyStationId).map(entry =>
-          <PriceHistory key={entry.station.id} station={entry.station} fuel={fuel} observedAt={result.observedAt} />)}
+          <PriceHistory key={entry.station.id} station={entry.station} availableStations={historyStations} fuel={fuel} observedAt={result.observedAt} />)}
         </>}
       </Suspense></div>
       {!historyStationId && <div className="history-placeholder"><Icon name="chart" /><div><h3>Jeder Abruf erzählt ein Stück mehr.</h3><p>Wähle nach deiner Suche bei einer Tankstelle „Preisverlauf ansehen“, um gespeicherte Beobachtungen zu vergleichen.</p></div></div>}

@@ -120,3 +120,25 @@ Mit dessen Daten wurden Mengen- und Kraftstoffwechsel sowie die Kosten je
 Tankstelle geprüft. E10: 40 Liter von 87,16 € bis 91,96 € (4,80 € Unterschied),
 35,5 Liter von 77,35 € bis 81,61 € (4,26 € Unterschied). Es handelt sich um
 zeitgebundene Rechenwerte zum angegebenen Datenstand, keine aktuellen Angebote.
+
+## Ergänzung: Vergleich gespeicherter Preisverläufe (17.10.2026)
+
+Sieben neue Tests prüfen gemeinsame Zeitpunkte ohne Auffüllen fehlender Preise,
+stabile Serienzuordnung bei leeren/fehlerhaften Daten, Auswahlbegrenzung,
+Validierung von Station/Kraftstoff/Preis/Zeitgrenzen/Duplikaten, Sortierung,
+Teilfehler sowie ungültige JSON-Antworten und abgebrochene Anfragen.
+Alle 17 Frontend-Tests, Produktionsbuild und ESLint sind bestanden.
+
+Browserprüfung über `/tests/history-comparison.html` mit ausdrücklich
+synthetischen Daten und der echten Verlaufskomponente: zwei/drei Stationen,
+deaktivierte zusätzliche Auswahl, Entfernen und Reset, Einzelpunkt, Teilfehler,
+leere Serie sowie komplett leerer E5-Zustand. Dieselwechsel, 24-Stunden-Auswahl,
+Neuladen und die Tabelle mit sieben Messwerten wurden geprüft.
+Die schmale Ansicht mit 390 Pixeln zeigte keinen horizontalen Seitenüberlauf
+(Seitenbreite 375 Pixel), auch bei geöffneter Tabelle. Desktopdarstellung wurde
+visuell geprüft. Diese Prüfung umfasst keine vollständige Screenreader-Abnahme.
+
+Keine Tankerkönig-Abfrage für diese Tests. Das Backend wurde nicht verändert;
+die bestehenden Backend-Tests wurden für diese reine Frontend-Erweiterung
+nicht erneut ausgeführt. Der Browserlauf verwendet synthetische Daten und
+ersetzt keine erneute Integrationserprobung mit echten gespeicherten Verläufen.

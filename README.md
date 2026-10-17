@@ -21,6 +21,7 @@ Implementiert sind Ortssuche, auswählbarer Radius, Abruf und Speicherung von
 Tankerkönig-Preisen, Kraftstoffauswahl, Sortierung, Tankstellenkarte,
 Preisvergleich sowie gespeicherte Preisverläufe als Diagramm und Tabelle.
 Ein Tankkostenrechner vergleicht Füllbeträge für eine frei wählbare Literzahl.
+Bis zu drei Tankstellen lassen sich gemeinsam im Verlaufsdiagramm vergleichen.
 Die Anwendung ist für den lokalen Entwicklungsbetrieb eingerichtet.
 
 ## Lokal starten (Windows / PowerShell)
@@ -107,7 +108,8 @@ lokale Passwort aus `.env`.
 1. Ort oder PLZ suchen und einen Treffer anhand seiner Koordinaten auswählen.
 2. Radius und Kraftstoff wählen, dann „Preise abrufen“ anklicken.
 3. Preise vergleichen, sortieren und Markierungen auf der Karte öffnen.
-4. Bei einer Tankstelle „Preisverlauf ansehen“ wählen; Zeitraum einstellen.
+4. Bei einer Tankstelle „Preisverlauf ansehen“ wählen; Zeitraum einstellen und
+   bei Bedarf bis zu zwei weitere Tankstellen aus dem Suchergebnis auswählen.
 5. Im Tankkostenrechner eine Menge zwischen 0,1 und 200 Litern eingeben.
    Füllkosten und Unterschiede erscheinen auch je Tankstelle in der Liste.
 

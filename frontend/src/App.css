@@ -1823,3 +1823,22 @@ input, select, button {
   .station-table .station-fill-cost > strong { font-size: 12px; }
   .station-fill-cost { font-size: 9px; }
 }
+
+.history-picker { margin: 22px 0; padding: 18px; border: 1px solid #d8e1cf; border-radius: 9px; background: #f7f9f2; }
+.history-picker legend { padding: 0 8px; margin: 0; font-size: 13px; }
+.history-picker > .last-checked { margin-top: 0; }
+.history-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-height: 210px; overflow: auto; padding: 4px; }
+.history-choices label { display: flex; align-items: flex-start; gap: 9px; padding: 10px; background: #fff; border: 1px solid #dfe5d8; border-radius: 6px; font-size: 11px; line-height: 1.6; cursor: pointer; }
+.history-choices label:has(input:checked) { border-color: #63864a; background: #eef4e4; }
+.history-choices label:has(input:disabled) { color: #788271; cursor: not-allowed; }
+.history-choices input { width: 16px; height: 16px; margin: 1px 0 0; padding: 0; flex-shrink: 0; accent-color: #527444; }
+.history-reset { margin-top: 12px; color: #47683a; background: #edf2e5; border-color: #cbd9bc; font-size: 11px; }
+.history-reset:hover:not(:disabled) { background: #dfe9d2; }
+.history-legend { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 22px; margin: 20px 0 8px; }
+.history-legend li { display: flex; gap: 9px; align-items: flex-start; font-size: 11px; max-width: 340px; overflow-wrap: anywhere; }
+.history-legend small { display: block; color: #6c7a64; margin-top: 5px; }
+.history-line-sample { width: 27px; border-top: 3px solid; flex-shrink: 0; margin-top: 6px; }
+.history-line-sample.line-1 { border-top-style: dashed; }
+.history-line-sample.line-2 { border-top-style: dotted; }
+.history-series-status p { font-size: 11px; margin: 6px 0; }
+@media (max-width: 600px) { .history-choices { grid-template-columns: 1fr; } .history-picker { padding: 12px; } .history-legend { flex-direction: column; } }
