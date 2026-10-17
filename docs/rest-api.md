@@ -21,7 +21,8 @@ Abruf beim Backend-Start. Nur auf ausdrückliche Nutzeraktion aufrufen.
 - Geschlossene Tankstellen bleiben enthalten, haben aber keine verfügbaren Preise.
 - Fehlende oder false-Preise sind keine Nullpreise und werden nicht gespeichert.
 - PLZ werden als Zeichenfolge gespeichert, numerische PLZ auf fünf Stellen ergänzt.
-- Es erfolgt noch keine Ortssuche/Geocodierung und keine benutzerdefinierte Sortierung.
+- Die Koordinaten stammen in der Oberfläche aus der separaten Ortssuche.
+  Kraftstoffwahl und Sortierung erfolgen lokal im Frontend.
 - HTTP 400: Eingabefehler; 429: weniger als 61 Sekunden seit der letzten Abfrage;
   503: fehlender/ungültig formatierter lokaler Schlüssel; 502: ungültige Anbieterantwort.
 - Abfrageabstand gilt innerhalb einer Backend-Instanz, auch für fehlgeschlagene
@@ -53,4 +54,13 @@ Ein leerer Verlauf bedeutet nicht, dass sich der Preis nicht geändert hat.
 
 In der Entwicklung sind die Endpunkte direkt über localhost:8080 oder über
 den Vite-Proxy auf localhost:5173 erreichbar. Nach Java-Änderungen ist ein
-Backend-Neustart nötig. Eine Ortssuche wird später separat ergänzt.
+Backend-Neustart nötig.
+
+## Ortssuche
+
+`GET /api/locations?query=Detmold`
+
+Liefert bis zu fünf deutsche Ortstreffer mit Koordinaten über Open-Meteo/GeoNames.
+Die Suchzeichenfolge muss nach dem Trimmen 2 bis 100 Zeichen enthalten.
+Die Antwort enthält `locations`, `source` und `sourceUrl`; es werden keine Preise geladen.
+Caching, Abfragegrenzen und Datenquellen sind in [geocoding.md](geocoding.md) beschrieben.

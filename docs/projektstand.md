@@ -210,3 +210,18 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
   Detmolder Tankstellen geprüft, Datenstand 17.10.2026 12:09:56 Uhr Berlin.
 - Berechnungsdefinitionen in docs/price-comparison.md, lokale Vorschau unter
   tmp/price-comparison.png.
+
+## Gesamttest und Dokumentationsstand (17.10.2026)
+
+- Vollständiger bestehender Testlauf: 42 Backend- und 5 Frontend-Tests bestanden;
+  TypeScript/Vite-Build und ESLint bestanden.
+- PostgreSQL healthy; lokale HTTP-Prüfungen für Health, 400, 404 und leeren
+  Verlauf erfolgreich. Browserprüfung von Entfernungssortierung, Verlauf aus
+  sortierter Liste und Auswahlzurücksetzung nach Eingabeänderung.
+- Vorhandenes Suchergebnis weiterverwendet; kein neuer Anbieter-Preisabruf
+  für diesen Gesamttest. Keine Änderungen an Datenbankvolume oder Zugangsdaten.
+- README um tatsächlichen Funktionsstand, Einrichtung, Start über PowerShell
+  und IntelliJ, Tests sowie Fehlerbehebung ergänzt. Veraltete REST-Hinweise korrigiert.
+- Architektur und relationales Datenmodell in docs/architektur.md beschrieben.
+  Ausgeführte Prüfungen und ausdrücklich offene Abgabepunkte stehen in
+  docs/testprotokoll.md. Keine vollständige Abnahme oder Produktionsfreigabe.
