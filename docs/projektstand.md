@@ -244,3 +244,23 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
   Vorhandene Preisverläufe verwendet; keine Änderung an Backend oder Datenbankschema.
 - Fünf Frontend-Tests, Build und ESLint bestanden. Vorschauen lokal unter
   tmp/dashboard-desktop.png und tmp/dashboard-mobile.png.
+
+## Tankkostenrechner (17.10.2026)
+
+- Einstellbare Tankmenge von 0,1 bis 200 Litern mit einer Nachkommastelle;
+  Vorgabe 40 Liter, Schnellauswahl 20/40/60 Liter, Komma und Punkt akzeptiert.
+- Übersicht für günstigste/teuerste Füllung und Preisunterschied. Kosten und
+  Differenz zum günstigsten Füllbetrag zusätzlich je Tankstelle in der Liste.
+- Berechnung aus dem bestehenden Suchergebnis; nur geöffnete Tankstellen mit
+  verfügbarem Preis. Keine zusätzliche Anbieteranfrage bei Mengen-/Kraftstoffwechsel.
+- Centgenaue Rundung vollständiger Füllbeträge; ungültige Eingaben zeigen keine
+  alten Kosten. Fahrtkosten und Umwege sind ausdrücklich nicht berücksichtigt.
+- Zehn Frontend-Tests bestanden, Build und ESLint bestanden. Synthetische
+  UI-Prüfung ergänzt unter /tests/tank-calculator.html im Vite-Entwicklungsserver.
+- Browserprüfung: 35,5 Liter, leere Eingabe, Schnellauswahl, Kraftstoffwechsel,
+  fehlende Preise und geschlossene Tankstellen mit gekennzeichneten Testdaten.
+  Isolierte Komponente auf 390 Pixeln ohne horizontalen Überlauf geprüft.
+- Erster Live-Versuch lieferte HTTP 502. Nach Mindestabstand erneuter Abruf
+  erfolgreich: 13 Tankstellen Detmold, 17.10.2026 13:04:58 Uhr Berlin.
+  Beträge für 40/35,5 Liter sowie Tabellenunterschiede und E10/Diesel geprüft.
+- Details in docs/tank-costs.md, lokale Vorschau unter tmp/tank-costs.png.

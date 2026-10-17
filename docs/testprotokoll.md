@@ -99,3 +99,24 @@ Messung der DOM-Breiten: kein horizontaler Seitenüberlauf bei 1440, 900 und
 320 Pixeln wurde korrigiert und erneut geprüft. Die Breitenprüfung ersetzt
 keine vollständige Prüfung aller Bildschirmgrößen, Browser oder Screenreader.
 Frontend-Tests, Build und ESLint wurden nach den Änderungen erneut ausgeführt.
+
+## Ergänzung: Tankkostenrechner
+
+Fünf weitere automatisierte Tests für den Tankkostenrechner sind hinzugekommen;
+der Frontend-Testlauf umfasst jetzt zehn bestandene Tests. Build und ESLint
+sind bestanden. Geprüft werden Mengenparsing, gültige Grenzwerte, ungültige
+Eingaben, Dezimalmengen, Cent-Rundung und Differenzen gerundeter Füllbeträge.
+
+Die isolierte Testseite `/tests/tank-calculator.html` enthält ausschließlich
+synthetische Daten und verwendet die tatsächlichen Komponenten. Im Browser
+wurden 40 und 35,5 Liter, leere Eingaben, die Schnellauswahl, Diesel/E10 sowie
+ein Kraftstoff ohne Daten geprüft. Fehlende Preise und geschlossene Tankstellen
+erhalten keinen Füllbetrag. Die Testkomponente wurde bei 390 Pixeln ohne
+horizontalen Seitenüberlauf angezeigt.
+
+Ein erster Live-Abruf scheiterte mit HTTP 502; nach Ablauf der Sperre folgte
+ein erfolgreicher Abruf mit 13 Tankstellen in Detmold um 13:04:58 Uhr Berlin.
+Mit dessen Daten wurden Mengen- und Kraftstoffwechsel sowie die Kosten je
+Tankstelle geprüft. E10: 40 Liter von 87,16 € bis 91,96 € (4,80 € Unterschied),
+35,5 Liter von 77,35 € bis 81,61 € (4,26 € Unterschied). Es handelt sich um
+zeitgebundene Rechenwerte zum angegebenen Datenstand, keine aktuellen Angebote.

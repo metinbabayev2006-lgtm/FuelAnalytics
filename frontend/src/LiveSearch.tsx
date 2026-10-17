@@ -1,6 +1,9 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { StationsMap } from './StationsMap'
 import { PriceSummary } from './PriceSummary'
+import { StationFillCost, TankCalculator } from './TankCalculator'
+import { summarizePrices } from './priceStatistics'
+import { fillCostCents, parseTankVolume } from './tankCosts'
 import { Icon } from './Icon'
 import { LocationPicker } from './LocationPicker'
 import { locationLabel } from './location'
@@ -45,6 +48,7 @@ function validResult(value: unknown): value is Result {
 export function LiveSearch() {
   const [fuel, setFuel] = useState<Fuel>('e10')
   const [sort, setSort] = useState('price')
+  const [tankAmount, setTankAmount] = useState('40')
   const [historyStationId, setHistoryStationId] = useState<string | null>(null)
   const [result, setResult] = useState<(Result & { searchLabel: string; radiusKm: number; center: Location }) | null>(null)
   const [location, setLocation] = useState<Location | null>(null)
@@ -106,6 +110,10 @@ export function LiveSearch() {
     return a.distanceKm - b.distanceKm || a.station.name.localeCompare(b.station.name)
   }), [result, sort, fuel])
 
+  const comparison = useMemo(() => summarizePrices(result?.stations ?? [], fuel), [result, fuel])
+  const tankVolume = parseTankVolume(tankAmount)
+  const cheapestFill = comparison ? fillCostCents(comparison.min, tankVolume) : null
+
   return <section className="live-card" aria-labelledby="live-title">
     <div className="search-panel" id="search-panel">
     <div className="section-heading"><div><p className="section-kicker">01 / DEINE SUCHE</p><h2 id="live-title">Wo möchtest du tanken?</h2></div><span className="live-badge"><span />Daten von Tankerkönig</span></div>
@@ -140,6 +148,7 @@ export function LiveSearch() {
       {(loading || error) && <p className="loading">Die angezeigten Ergebnisse stammen weiterhin vom oben genannten Datenstand.</p>}
       {result.rejectedStations > 0 && <p className="loading">{result.rejectedStations} ungültige Datensätze wurden verworfen.</p>}
       <PriceSummary entries={result.stations} fuel={fuel} />
+      <TankCalculator value={tankAmount} onChange={setTankAmount} minimumPrice={comparison?.min ?? null} maximumPrice={comparison?.max ?? null} />
       <div className="results-grid">
       <StationsMap entries={entries} fuel={fuel} center={result.center} radiusKm={result.radiusKm} observedAt={result.observedAt} />
       <section className="station-panel" aria-labelledby="stations-title"><div className="panel-heading"><div><p className="section-kicker">PREISE IM VERGLEICH</p><h4 id="stations-title">Deine Tankstellen</h4></div><span className="count-badge">{entries.length}</span></div>
@@ -152,7 +161,7 @@ export function LiveSearch() {
               <span className={`station-open ${entry.open ? 'connected' : 'demo-note'}`}>{entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'}</span>
               <button className="history-button" aria-pressed={historyStationId === entry.station.id} onClick={() => setHistoryStationId(entry.station.id)}><Icon name="chart" />Preisverlauf ansehen<span className="sr-only">: {entry.station.name}</span><Icon name="arrow" /></button></td>
             <td className="station-distance">{distanceFormat.format(entry.distanceKm)} km</td>
-            <td className="station-price">{entry.prices[fuel] !== undefined ? priceFormat.format(entry.prices[fuel]!) : 'Nicht verfügbar'}</td>
+            <td className="station-price">{entry.prices[fuel] !== undefined ? priceFormat.format(entry.prices[fuel]!) : 'Nicht verfügbar'}<StationFillCost price={entry.open ? entry.prices[fuel] : undefined} volume={tankVolume} cheapestCents={cheapestFill} /></td>
           </tr>)}</tbody>
         </table>
       </div>}</section></div>

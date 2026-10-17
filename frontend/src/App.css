@@ -1773,3 +1773,53 @@ input, select, button {
   }
 
 }
+
+.tank-calculator {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.6fr);
+  gap: 28px;
+  padding: 24px;
+  margin: 0 0 26px;
+  background: #eef3e5;
+  border: 1px solid #d5dfc7;
+  border-radius: 12px;
+}
+.tank-heading { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; }
+.tank-heading > .icon { color: #60804d; width: 25px; height: 25px; }
+.tank-heading h4 { margin: 0; font-size: 16px; }
+.tank-heading .section-kicker { margin-bottom: 6px; }
+.tank-input-panel > label { display: block; color: #51654a; font-size: 12px; margin-bottom: 8px; }
+.tank-volume-input { position: relative; max-width: 260px; }
+.tank-volume-input input { width: 100%; padding-right: 55px; background: #fff; font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tank-volume-input > span { position: absolute; right: 14px; top: 16px; color: #728169; font-size: 12px; }
+.tank-volume-input input[aria-invalid=true] { border-color: #a74d3c; }
+.tank-presets { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.tank-presets button { padding: 8px 11px; font-size: 11px; background: transparent; border-color: #bcccac; color: #4b683c; }
+.tank-presets button[aria-pressed=true] { color: #fff; background: #365d40; border-color: #365d40; }
+.tank-presets button:hover:not(:disabled) { background: #dbe7cc; color: #284b30; }
+.tank-input-panel p { font-size: 10px; padding: 0; background: none; }
+.tank-estimate { display: flex; justify-content: center; flex-direction: column; border-left: 1px solid #d0ddc1; padding-left: 28px; }
+.tank-estimate-label { color: #59714b; font-size: 12px; margin: 0 0 18px; }
+.tank-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 0; }
+.tank-totals dt { color: #677b5c; font-size: 11px; }
+.tank-totals dd { margin: 10px 0 0; color: #2f5038; font-size: clamp(20px, 2vw, 28px); font-weight: 600; letter-spacing: -0.7px; font-variant-numeric: tabular-nums; }
+.tank-totals > div:last-child dd { color: #496e30; }
+.tank-estimate > .last-checked { font-size: 11px; margin-top: 22px; }
+.station-fill-cost { display: block; margin-top: 12px; padding-top: 9px; border-top: 1px solid #e1e7d7; color: #71806a; font-size: 10px; font-weight: 400; letter-spacing: 0; line-height: 1.6; }
+.station-table .station-fill-cost > strong { font-size: 13px; font-weight: 600; color: #35563b; }
+.station-fill-cost > span { display: block; margin-top: 2px; }
+.station-fill-cost > .best-fill { color: #416a32; font-weight: 600; }
+@media (max-width: 1250px) {
+  .tank-calculator { grid-template-columns: minmax(200px, 1fr) minmax(0, 1.3fr); gap: 20px; }
+  .tank-totals { grid-template-columns: 1fr; gap: 10px; }
+  .tank-totals > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .tank-totals dd { margin: 0; font-size: 23px; }
+  .tank-estimate { padding-left: 20px; }
+}
+@media (max-width: 600px) {
+  .tank-calculator { grid-template-columns: 1fr; padding: 20px; }
+  .tank-estimate { border-left: 0; border-top: 1px solid #d0ddc1; padding: 20px 0 0; }
+  .tank-volume-input { max-width: none; }
+  .station-table .station-fill-cost > strong { font-size: 12px; }
+  .station-fill-cost { font-size: 9px; }
+}

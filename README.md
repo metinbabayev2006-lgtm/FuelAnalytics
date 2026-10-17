@@ -20,6 +20,7 @@ vergleichen sowie gespeicherte Preisbeobachtungen analysieren und visualisieren.
 Implementiert sind Ortssuche, auswählbarer Radius, Abruf und Speicherung von
 Tankerkönig-Preisen, Kraftstoffauswahl, Sortierung, Tankstellenkarte,
 Preisvergleich sowie gespeicherte Preisverläufe als Diagramm und Tabelle.
+Ein Tankkostenrechner vergleicht Füllbeträge für eine frei wählbare Literzahl.
 Die Anwendung ist für den lokalen Entwicklungsbetrieb eingerichtet.
 
 ## Lokal starten (Windows / PowerShell)
@@ -107,6 +108,8 @@ lokale Passwort aus `.env`.
 2. Radius und Kraftstoff wählen, dann „Preise abrufen“ anklicken.
 3. Preise vergleichen, sortieren und Markierungen auf der Karte öffnen.
 4. Bei einer Tankstelle „Preisverlauf ansehen“ wählen; Zeitraum einstellen.
+5. Im Tankkostenrechner eine Menge zwischen 0,1 und 200 Litern eingeben.
+   Füllkosten und Unterschiede erscheinen auch je Tankstelle in der Liste.
 
 Live-Preise werden ausschließlich auf Klick abgerufen und dabei gespeichert.
 Zwischen Anbieterabrufen liegen mindestens 61 Sekunden pro Backend-Instanz.
@@ -159,6 +162,7 @@ unter Erhalt des Volumes.
 - [REST-API](docs/rest-api.md)
 - [Ortssuche](docs/geocoding.md), [Karte](docs/maps.md)
 - [Preisvergleich](docs/price-comparison.md), [Preisverlauf](docs/price-history.md)
+- [Tankkostenrechner](docs/tank-costs.md)
 - [Testprotokoll und offene Abgabepunkte](docs/testprotokoll.md)
 - [Projektfortschritt](docs/projektstand.md)
 
