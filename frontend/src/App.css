@@ -1841,4 +1841,13 @@ input, select, button {
 .history-line-sample.line-1 { border-top-style: dashed; }
 .history-line-sample.line-2 { border-top-style: dotted; }
 .history-series-status p { font-size: 11px; margin: 6px 0; }
+.history-analysis { margin-top: 26px; }
+.history-analysis h4 { margin-bottom: 8px; }
+.history-statistics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px; margin: 18px 0 26px; }
+.history-stat-card { min-width: 0; padding: 18px; border: 1px solid #d8e1cf; border-radius: 9px; background: #f7f9f2; }
+.history-stat-card h5 { font-size: 13px; margin: 0 0 18px; overflow-wrap: anywhere; }
+.history-stat-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; margin: 0; }
+.history-stat-card dt { font-size: 11px; color: #63735c; }
+.history-stat-card dd { margin: 5px 0 0; font-size: 23px; font-weight: 600; color: #35563b; font-variant-numeric: tabular-nums; }
+.history-stat-card > .last-checked { margin-bottom: 0; }
 @media (max-width: 600px) { .history-choices { grid-template-columns: 1fr; } .history-picker { padding: 12px; } .history-legend { flex-direction: column; } }

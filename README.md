@@ -22,6 +22,7 @@ Tankerkönig-Preisen, Kraftstoffauswahl, Sortierung, Tankstellenkarte,
 Preisvergleich sowie gespeicherte Preisverläufe als Diagramm und Tabelle.
 Ein Tankkostenrechner vergleicht Füllbeträge für eine frei wählbare Literzahl.
 Bis zu drei Tankstellen lassen sich gemeinsam im Verlaufsdiagramm vergleichen.
+Je Tankstelle werden Minimum, Maximum, Durchschnitt und Messanzahl ausgewertet.
 Die Anwendung ist für den lokalen Entwicklungsbetrieb eingerichtet.
 
 ## Lokal starten (Windows / PowerShell)

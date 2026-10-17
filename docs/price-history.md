@@ -42,3 +42,19 @@ Sie bietet zeitversetzte Messungen, einen Einzelpunkt, leere Ergebnisse und
 einen simulierten Ladefehler, ohne Anbieter- oder Datenbankanfragen auszuführen.
 
 Technische Referenz: https://recharts.github.io/en-US/api/LineChart/
+
+## Auswertung pro Tankstelle
+
+Unter dem gemeinsamen Zeitraum zeigt jede ausgewählte Tankstelle eine Karte
+mit Minimum, Maximum, arithmetischem Mittel und Anzahl ihrer geladenen Messungen.
+Die Anzeige rundet Preise auf drei Nachkommastellen; gerechnet wird vorher
+ohne Zwischenrundung. Erste und letzte tatsächlich gespeicherte Messung werden
+in Europe/Berlin angegeben. Sie können einen kleineren Zeitraum abdecken als
+die ausgewählten 24 Stunden, 7 oder 30 Tage.
+
+Jeder Abruf zählt gleich, auch wenn derselbe Preis wiederholt gespeichert wurde.
+Der Mittelwert ist daher kein zeitgewichteter Tages-/Marktdurchschnitt. Es gibt
+keine Prognose oder Rangfolge aus unterschiedlich dicht erfassten Verläufen.
+Ein Einzelwert liefert gleiche Minimum-/Mittel-/Maximumwerte mit eigenem Hinweis.
+Leere oder fehlerhafte Verläufe haben keine Preiskennzahlen. Die Auswertung
+verwendet dieselben geladenen Daten wie das Diagramm, ohne zusätzliche Anfragen.

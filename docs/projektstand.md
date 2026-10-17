@@ -279,3 +279,15 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
 - Bei 390 Pixeln kein horizontaler Seitenüberlauf, auch mit geöffneter Tabelle.
   Vorschauen: tmp/history-comparison.png und tmp/history-comparison-mobile.png.
   Für diese Funktion keine neuen Live-Preise abgerufen; Backend unverändert.
+
+## Kennzahlen gespeicherter Preisverläufe (17.10.2026)
+
+- Auswertung je ausgewählter Tankstelle mit Minimum, Maximum, arithmetischem
+  Mittel, Messanzahl und Zeitpunkt der ersten/letzten Messung im gewählten Fenster.
+- Durchschnitt ausdrücklich als gleich gewichteter Abrufdurchschnitt erklärt;
+  keine Prognose oder zeitgewichtete Aussage. Einzelmessung mit eigenem Hinweis,
+  leere und fehlerhafte Verläufe ohne scheinbare Nullpreise.
+- Berechnung aus bereits geladenen Daten, ohne zusätzliche Anbieter-/API-Anfragen.
+- 19 Frontend-Tests sowie Build und ESLint bestanden. Synthetische Browserprüfung
+  für drei Stationen, Einzelmessung, Teilfehler und leeren Kraftstoffzustand.
+  Bei 390 Pixeln kein horizontaler Seitenüberlauf. Vorschau: tmp/history-statistics.png.

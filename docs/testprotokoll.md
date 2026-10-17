@@ -142,3 +142,19 @@ Keine Tankerkönig-Abfrage für diese Tests. Das Backend wurde nicht verändert;
 die bestehenden Backend-Tests wurden für diese reine Frontend-Erweiterung
 nicht erneut ausgeführt. Der Browserlauf verwendet synthetische Daten und
 ersetzt keine erneute Integrationserprobung mit echten gespeicherten Verläufen.
+
+## Ergänzung: Verlaufskennzahlen (17.10.2026)
+
+Zwei zusätzliche Tests prüfen den gleich gewichteten Mittelwert bei wiederholten
+Preisen und ungleichmäßigen Zeitabständen, Minimum/Maximum, Messanzahl,
+erste/letzte Messung bei unsortierter Eingabe, unveränderte Quelldaten sowie
+leere und einzelne Messreihen. Alle 19 Frontend-Tests, Build und ESLint bestanden.
+
+Die bestehende synthetische Browser-Testseite zeigte für Nord Minimum 1,759,
+Mittel 1,779, Maximum 1,799 bei drei Messungen; für Süd Mittel 1,822 bei drei
+Messungen. Der Einzelpunkt zeigte dreimal 1,789 mit erklärendem Hinweis.
+Ein simulierter Ladefehler ließ die erfolgreichen Auswertungen bestehen.
+E5 ohne Messwerte zeigte keine alten Kennzahlen und keine Nullpreise.
+Bei 390 Pixeln: Seitenbreite 375 Pixel, Kartenbreite 313 Pixel, kein horizontaler
+Seitenüberlauf. Desktopvorschau und schmale Ansicht lokal gespeichert.
+Keine neuen echten Preise abgerufen; keine Backend-Änderungen.

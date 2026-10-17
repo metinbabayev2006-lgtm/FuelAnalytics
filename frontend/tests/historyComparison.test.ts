@@ -1,11 +1,34 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { comparisonRows, loadHistorySeries, toggleComparison, validateHistory } from '../src/historyComparison.ts'
+import { comparisonRows, historyStatistics, loadHistorySeries, toggleComparison, validateHistory } from '../src/historyComparison.ts'
 import type { Observation } from '../src/historyComparison.ts'
 
 const from = '2026-10-16T00:00:00Z'
 const to = '2026-10-17T00:00:00Z'
 const point = (stationId: string, hour: number, price = 1.799): Observation => ({ stationId, fuelType: 'e10', price, observedAt: `2026-10-16T${String(hour).padStart(2, '0')}:00:00Z` })
+
+test('history statistics count repeated samples equally without time weighting or input mutation', () => {
+  const prices = [point('a', 23, 1.899), point('a', 0, 1.799), point('a', 1, 1.799)]
+  const snapshot = structuredClone(prices)
+  const stats = historyStatistics(prices)!
+  assert.equal(stats.count, 3)
+  assert.equal(stats.min, 1.799)
+  assert.equal(stats.max, 1.899)
+  assert.ok(Math.abs(stats.mean - (1.899 + 1.799 + 1.799) / 3) < 1e-12)
+  assert.equal(stats.first, Date.parse(point('a', 0).observedAt))
+  assert.equal(stats.last, Date.parse(point('a', 23).observedAt))
+  assert.deepEqual(prices, snapshot)
+})
+
+test('empty histories have no statistics and a single sample has equal price metrics', () => {
+  assert.equal(historyStatistics([]), null)
+  const stats = historyStatistics([point('a', 8, 1.739)])!
+  assert.equal(stats.count, 1)
+  assert.equal(stats.min, 1.739)
+  assert.equal(stats.mean, 1.739)
+  assert.equal(stats.max, 1.739)
+  assert.equal(stats.first, stats.last)
+})
 
 test('merges actual timestamps without filling missing prices or inserting zeros', () => {
   const series = [

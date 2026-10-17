@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { comparisonRows, historyStationLabel, loadHistorySeries, toggleComparison } from './historyComparison'
+import { comparisonRows, historyStationLabel, historyStatistics, loadHistorySeries, toggleComparison } from './historyComparison'
 import type { Fuel, HistorySeries, HistoryStation } from './historyComparison'
 
 const names = { diesel: 'Diesel', e5: 'Super E5', e10: 'Super E10' }
@@ -40,6 +40,29 @@ export function ComparisonChart({ series }: { series: HistorySeries[] }) {
   </>
 }
 
+export function HistoryStatistics({ series }: { series: HistorySeries[] }) {
+  return <section className="history-analysis" aria-labelledby="history-analysis-title">
+    <h4 id="history-analysis-title">Auswertung der gespeicherten Messungen</h4>
+    <p className="last-checked">Für den oben gewählten Zeitraum · Preise in €/Liter. Der Durchschnitt zählt jeden Abruf gleich, auch wiederholte Preise. Er ist kein zeitgewichteter Tagesdurchschnitt und keine Prognose.</p>
+    <div className="history-statistics">{series.map(entry => {
+      const stats = entry.error ? null : historyStatistics(entry.prices)
+      return <article key={entry.station.id} className="history-stat-card">
+        <h5>{historyStationLabel(entry.station)}</h5>
+        {stats ? <>
+          <dl>
+            <div><dt>Niedrigster Preis</dt><dd>{priceFormat.format(stats.min)}</dd></div>
+            <div><dt>Durchschnitt</dt><dd>{priceFormat.format(stats.mean)}</dd></div>
+            <div><dt>Höchster Preis</dt><dd>{priceFormat.format(stats.max)}</dd></div>
+            <div><dt>Messungen</dt><dd>{stats.count}</dd></div>
+          </dl>
+          <p className="last-checked">Erste Messung: <time dateTime={new Date(stats.first).toISOString()}>{dateFormat.format(new Date(stats.first))}</time><br />Letzte Messung: <time dateTime={new Date(stats.last).toISOString()}>{dateFormat.format(new Date(stats.last))}</time></p>
+          {stats.count === 1 && <p className="last-checked">Nur eine Messung: Alle drei Preiskennzahlen sind gleich; eine Entwicklung ist daraus nicht ableitbar.</p>}
+        </> : <p className="last-checked">{entry.error ? 'Auswertung nicht verfügbar: Verlauf konnte nicht geladen werden.' : 'Keine Messungen im gewählten Zeitraum; keine Preiskennzahlen verfügbar.'}</p>}
+      </article>
+    })}</div>
+  </section>
+}
+
 function HistoryData({ stations, fuel, days, loadSeries }: { stations: HistoryStation[]; fuel: Fuel; days: number; loadSeries: typeof loadHistorySeries }) {
   const [state, setState] = useState<{ series: HistorySeries[]; from: string; to: string } | null>(null)
   useEffect(() => {
@@ -65,6 +88,7 @@ function HistoryData({ stations, fuel, days, loadSeries }: { stations: HistorySt
         : entry.prices.length === 0 ? <p role="status">{historyStationLabel(entry.station)}: Keine Beobachtungen für diesen Kraftstoff und Zeitraum gespeichert.</p>
           : <p><strong>{entry.station.name}</strong>: {entry.prices.length} Beobachtungen{entry.prices.length === 1 ? ' · Nur ein Messpunkt, noch kein Verlauf.' : ''}</p>}
     </div>)}
+    <HistoryStatistics series={state.series} />
     {hasPrices && <ComparisonChart series={state.series} />}
     {state.series.every(entry => entry.error) && <p>Bitte prüfe das Backend und lade den Verlauf erneut.</p>}
   </>

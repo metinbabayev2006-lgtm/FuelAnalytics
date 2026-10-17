@@ -3,6 +3,21 @@ export type HistoryStation = { id: string; name: string; street?: string | null;
 export type Observation = { stationId: string; fuelType: string; price: number; observedAt: string }
 export type HistorySeries = { station: HistoryStation; prices: Observation[]; error?: string }
 
+/** Arithmetic mean of validated samples, not a time-weighted market average. */
+export function historyStatistics(prices: readonly Observation[]) {
+  if (prices.length === 0) return null
+  let min = Infinity, max = -Infinity, total = 0
+  let first = Infinity, last = -Infinity
+  for (const point of prices) {
+    min = Math.min(min, point.price)
+    max = Math.max(max, point.price)
+    total += point.price
+    first = Math.min(first, Date.parse(point.observedAt))
+    last = Math.max(last, Date.parse(point.observedAt))
+  }
+  return { count: prices.length, min, max, mean: total / prices.length, first, last }
+}
+
 export function historyStationLabel(station: HistoryStation) {
   const address = [station.street, station.houseNumber, station.place].filter(Boolean).join(' ')
   return address ? `${station.name} · ${address}` : station.name
