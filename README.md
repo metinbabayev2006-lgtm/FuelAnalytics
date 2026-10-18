@@ -15,6 +15,9 @@ vergleichen sowie gespeicherte Preisbeobachtungen analysieren und visualisieren.
 - `docs/`: Anforderungen, Architekturentscheidungen und Projektnotizen.
 - `compose.yaml`: lokale PostgreSQL-Datenbank; Flyway verwaltet ihr Schema.
 
+Das Backend ist in `controller`, `service`, `repository`, `model` und `client`
+gegliedert. Die Zuständigkeiten beschreibt die [Architekturdokumentation](docs/architektur.md#paketstruktur-im-backend).
+
 ## Aktueller Stand
 
 Implementiert sind Ortssuche, auswählbarer Radius, Abruf und Speicherung von

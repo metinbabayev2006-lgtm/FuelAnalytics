@@ -1,8 +1,12 @@
 package de.fuelanalytics.backend;
 
-import de.fuelanalytics.backend.price.*;
-import de.fuelanalytics.backend.station.*;
-import de.fuelanalytics.backend.tankerkoenig.*;
+import de.fuelanalytics.backend.model.FuelType;
+import de.fuelanalytics.backend.model.PriceObservation;
+import de.fuelanalytics.backend.model.Station;
+import de.fuelanalytics.backend.model.StationSearchResult;
+import de.fuelanalytics.backend.repository.PriceObservationRepository;
+import de.fuelanalytics.backend.repository.StationRepository;
+import de.fuelanalytics.backend.service.SearchResultStore;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;

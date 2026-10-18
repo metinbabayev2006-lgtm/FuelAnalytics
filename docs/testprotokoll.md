@@ -203,3 +203,15 @@ Zeitüberschreitungen bei Tankerkönig werden gesondert diagnostiziert.
 Die ursprüngliche externe Abrufstörung war aktuell nicht reproduzierbar.
 Offen bleiben insbesondere echte Geräteortung und tatsächlicher Excel-Import;
 der Bericht unterscheidet Live-Prüfungen und synthetische Prüfungen ausdrücklich.
+
+## Paketumordnung im Backend (18.10.2026)
+
+- `mvnw.cmd clean test`: erfolgreicher Neubau mit Java 21, 46 bestandene Tests,
+  keine Fehler; vier PostgreSQL-Tests werden hier planmäßig übersprungen.
+- `Test-Postgres.ps1`: alle vier PostgreSQL-Integrationstests separat bestanden.
+  Flyway richtete die isolierte Testdatenbank ein; der Testcontainer wurde
+  anschließend entfernt. Die lokale Anwendungsdatenbank wurde nicht verändert.
+- Paketnamen und Imports von Anwendung und Tests angepasst; der Spring-Kontext
+  startet mit der neuen Struktur. Änderungen im Java-Code beschränken sich
+  auf Pakete und Imports. Keine erneute Prüfung externer Anbieter oder des
+  unveränderten Frontends im Rahmen dieser Umordnung.

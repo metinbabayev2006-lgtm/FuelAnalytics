@@ -25,6 +25,30 @@ API-Schlüssel bleiben im Backend. Das Frontend verwendet Leaflet für die Karte
 und Recharts für den Preisverlauf. Nur Kartenkacheln werden direkt im Browser
 vom Kartenanbieter geladen.
 
+## Paketstruktur im Backend
+
+Unter `de.fuelanalytics.backend` sind die Klassen nach ihrer Aufgabe geordnet.
+Jede Klasse bleibt in einer eigenen Datei; die Tests spiegeln die Paketstruktur.
+
+| Paket | Verantwortung |
+| --- | --- |
+| `controller` | REST-Endpunkte für Status, Ortssuche, Tankstellen und Preisabruf |
+| `service` | Ablauf des Preisabrufs und transaktionales Speichern der Ergebnisse |
+| `repository` | Datenbankzugriff mit JDBC und SQL |
+| `model` | Datenmodelle für Orte, Tankstellen, Preise und Suchergebnisse |
+| `client` | HTTP-Anbindung externer Anbieter und Validierung ihrer Antworten |
+
+`BackendApplication` bleibt im übergeordneten Paket, damit Spring die
+Komponenten in allen Unterpaketen findet. `TankerkoenigMapper` gehört zum
+Client-Paket, weil er externe Antworten in unsere Datenmodelle überführt.
+
+Der Preisabruf läuft vom Controller über den Service zum Client und anschließend
+über den Speicherservice zu den Repositories. Einfache Lese-Endpunkte verwenden
+die Repositories direkt; eine zusätzliche Service-Klasse ohne eigene Logik
+wird dafür nicht eingeführt. JDBC und Flyway bleiben für Datenzugriff und
+Schemaänderungen zuständig. Die Umordnung ändert keine REST-Endpunkte oder
+Datenbanktabellen.
+
 ## Ablauf einer Suche
 
 1. Die separate Ortssuche liefert passende Namen und Koordinaten. Nutzer müssen

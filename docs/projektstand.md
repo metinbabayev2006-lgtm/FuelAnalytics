@@ -326,3 +326,14 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
   PostgreSQL-Tests separat bestanden. Build und ESLint erfolgreich.
 - Detaillierte Bedienungsprüfung, CSV-Formatprüfung und Grenzen stehen im
   neuen Bericht docs/abnahme-2026-10-17.md. Keine Behauptung vollständiger Abnahme.
+
+## Backend-Paketstruktur (18.10.2026)
+
+- Klassen nach Aufgabe in `controller`, `service`, `repository`, `model` und
+  `client` zusammengefasst; Tests entsprechend verschoben und Imports angepasst.
+- Bestehende Einzelklassen und Verantwortlichkeiten erhalten. Keine zusätzlichen
+  Frameworks, keine JPA-Umstellung und keine Änderung an REST-API oder Tabellen.
+- Vollständiger Neubau mit `mvnw.cmd clean test`: 46 Tests bestanden; die vier
+  PostgreSQL-Tests im Standardlauf planmäßig übersprungen und anschließend
+  separat mit `Test-Postgres.ps1` erfolgreich ausgeführt.
+- Struktur und Zuständigkeiten in docs/architektur.md dokumentiert.
