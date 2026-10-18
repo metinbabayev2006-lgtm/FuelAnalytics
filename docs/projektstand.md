@@ -337,3 +337,14 @@ Er prüft nur die Erreichbarkeit der Anwendung, keine Datenbank oder externen Di
   PostgreSQL-Tests im Standardlauf planmäßig übersprungen und anschließend
   separat mit `Test-Postgres.ps1` erfolgreich ausgeführt.
 - Struktur und Zuständigkeiten in docs/architektur.md dokumentiert.
+
+## Störung der Ortsnamensuche (18.10.2026)
+
+- Backend-Status antwortet mit HTTP 200. Die Suche nach Berlin liefert HTTP 502;
+  direkte HTTPS-Verbindungen zu Open-Meteo laufen sowohl über IPv4 als auch IPv6
+  in ein Verbindungszeitlimit. Die Ursache beim Anbieter oder auf dem Netzwerkweg
+  ist damit nicht abschließend geklärt; kein Hinweis auf einen Paketfehler.
+- Die unabhängige PLZ-Suche liefert für 10115 gültige Berlin-Koordinaten über
+  `/api/locations`. Die Oberfläche empfiehlt bei Ausfall der Ortsnamensuche
+  eine PLZ oder die ausdrücklich freizugebende Standortfunktion.
+- Nur Hinweistexte im Frontend geändert; Produktionsbuild und ESLint bestanden.

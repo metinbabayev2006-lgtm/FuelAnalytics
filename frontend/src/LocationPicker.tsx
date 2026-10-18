@@ -40,13 +40,13 @@ export function LocationPicker({ selected, onSelect, disabled, locating, onLocat
       if (!response.ok) throw new Error(response.status === 429 ? 'Bitte warte kurz vor der nächsten Ortssuche.'
         : response.status === 400 ? 'Bitte gib einen Ort mit 2 bis 100 Zeichen oder eine fünfstellige deutsche PLZ ein.'
           : /^[0-9]{5}$/.test(query.trim()) ? 'Der PLZ-Dienst ist nicht erreichbar oder liefert keine gültigen Koordinaten. Bitte suche stattdessen nach dem Ortsnamen.'
-            : 'Die Ortssuche ist derzeit nicht verfügbar. Bitte versuche es erneut.')
+            : 'Der Dienst für Ortsnamen ist derzeit nicht erreichbar. Bitte versuche eine fünfstellige PLZ (Berlin zum Beispiel: 10115) oder nutze deinen Standort.')
       const data: unknown = await response.json()
       if (typeof data !== 'object' || data === null || !('locations' in data) ||
         !Array.isArray(data.locations) || !data.locations.every(isLocation)) throw new Error('Die Ortssuche hat unerwartete Daten geliefert.')
       if (active.current === controller) { setLocations(data.locations); setSearched(true) }
     } catch (cause) {
-      if (active.current === controller) setError(controller.signal.aborted ? 'Die Ortssuche hat zu lange gedauert.'
+      if (active.current === controller) setError(controller.signal.aborted ? 'Die Ortssuche hat zu lange gedauert. Versuche eine PLZ statt des Ortsnamens oder umgekehrt, oder nutze deinen Standort.'
         : cause instanceof Error ? cause.message : 'Die Ortssuche ist fehlgeschlagen.')
     } finally {
       window.clearTimeout(timeout)
