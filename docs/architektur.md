@@ -69,7 +69,9 @@ Datenbanktabellen.
 
 Die ergänzende Elektro/Gas-Suche verwendet `EnergySearchController`,
 `EnergyLocationClient` und `EnergySearchResult`. Sie liest OSM-Standorte über
-Overpass und verwendet einen begrenzten Speicher-Cache. Dafür werden keine
+Overpass und verwendet einen begrenzten Speicher-Cache. Elektro verwendet
+stattdessen `ChargingRegisterClient` für den lokalen offiziellen CSV-Import
+der Bundesnetzagentur; Suchkoordinaten bleiben dabei im Backend. Dafür werden keine
 zusätzlichen Datenbanktabellen oder Preisbeobachtungen erzeugt. Details und
 Prüfgrenzen: [Elektro und Gas](elektro-gas.md).
 

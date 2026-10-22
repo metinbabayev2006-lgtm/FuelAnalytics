@@ -93,6 +93,7 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
         body: JSON.stringify({ latitude: location.latitude, longitude: location.longitude, radiusKm, kind: energy }),
       })
       if (!response.ok) throw new Error(response.status === 429 ? 'Bitte warte kurz. Der Standortdienst begrenzt Anfragen.'
+        : response.status === 503 && energy === 'electric' ? 'Das lokale Ladesäulenregister fehlt oder ist ungültig. Bitte das Importskript im Projektordner ausführen.'
         : response.status === 504 ? 'Der Standortdienst hat zu lange gebraucht. Versuche später einen kleineren Radius.'
           : 'Der Standortdienst ist derzeit nicht verfügbar. Bitte später erneut versuchen.')
       const data: unknown = await response.json()
@@ -159,7 +160,7 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
 
   return <section className="live-card" aria-labelledby="live-title">
     <div className="search-panel" id="search-panel">
-    <div className="section-heading"><div><p className="section-kicker">01 / DEINE SUCHE</p><h2 id="live-title">Wo möchtest du tanken?</h2></div><span className="live-badge"><span />{demo ? 'Synthetische Beispieldaten' : energy ? 'Standorte aus OpenStreetMap' : 'Daten von Tankerkönig'}</span></div>
+    <div className="section-heading"><div><p className="section-kicker">01 / DEINE SUCHE</p><h2 id="live-title">Wo möchtest du tanken?</h2></div><span className="live-badge"><span />{demo ? 'Synthetische Beispieldaten' : energy === 'electric' ? 'Ladesäulenregister · Bundesnetzagentur' : energy ? 'Standorte aus OpenStreetMap' : 'Daten von Tankerkönig'}</span></div>
     <div className="search-workspace">
     <LocationPicker selected={location} onSelect={setLocation} disabled={loading || demo} locating={locating} onLocationBusy={setLocating} />
     <div className="search-options"><h3><span className="step-number">2</span> Suche eingrenzen</h3>
@@ -186,7 +187,7 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
       <Icon name="arrow" /></button>
     <p className="last-checked">{energy ? 'Echte Standorte mit Entfernung und Route. Keine Live-Preise oder Belegung. Gas wird getrennt als LPG bzw. CNG gekennzeichnet.' : 'Abruf auf Klick. Danach frei vergleichen und sortieren.'}</p>
     </div></div>
-    {loading && <p role="status">{energy ? 'Standorte werden aus OpenStreetMap abgerufen …' : 'Tankstellen werden abgerufen und in der Datenbank gespeichert …'}</p>}
+    {loading && <p role="status">{energy ? 'Standorte werden gesucht …' : 'Tankstellen werden abgerufen und in der Datenbank gespeichert …'}</p>}
     {error && <p role="alert" className="error">{error}</p>}
     </div>
     {!energy && <><details className="favorites-panel"><summary>Meine Favoriten ({favorites.favorites.length})</summary>

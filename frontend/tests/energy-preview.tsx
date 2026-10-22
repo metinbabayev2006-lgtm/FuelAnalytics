@@ -6,7 +6,7 @@ import '../src/App.css'
 export function EnergyPreview() {
   const [kind, setKind] = useState<'electric' | 'gas'>('electric')
   const [empty, setEmpty] = useState(false)
-  const result: EnergyResult = { fetchedAt: '2026-10-22T12:00:00Z', kind, truncated: false, stations: empty ? [] : [
+  const result: EnergyResult = { fetchedAt: '2026-10-22T12:00:00Z', kind, truncated: false, source: 'osm', sourceDate: null, stations: empty ? [] : [
     { id: 'osm:node:1', name: 'SYNTHETISCH <script> Teststandort', latitude: 51.9386, longitude: 8.8732, distanceKm: 0,
       address: 'Fiktive Beispielstraße 1', services: kind === 'electric' ? ['Elektro'] : ['LPG', 'CNG'], access: 'customers', openingHours: 'Mo-Fr 08:00-20:00', connectors: kind === 'electric' ? ['CCS · 150 kW', 'Typ 2 · 22 kW'] : [] },
   ] }

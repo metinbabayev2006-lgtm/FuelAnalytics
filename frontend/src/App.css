@@ -1883,3 +1883,4 @@ input, select, button {
 .energy-services { display: inline-block; background: #e8efdc; color: #355c43; padding: 5px 9px; border-radius: 5px; margin: 10px 0 2px; font-size: 12px; font-weight: 600; }
 .station-price-marker.energy-marker.electric { background: #2459b8; color: #fff; }
 .station-price-marker.energy-marker.gas { background: #655019; color: #fff; }
+.station-price-marker.energy-marker { border-radius: 50%; border: 2px solid #fff; padding: 0; box-shadow: 0 1px 4px #0005; }

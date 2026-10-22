@@ -1,5 +1,17 @@
 # Projektstand
 
+## Elektro-Suche nach Anbieter-Zeitlimit korrigiert (22.10.2026)
+
+- Overpass-Störung auch mit kleinen Abfragen bestätigt: Überlastung/Timeout.
+- Elektro auf lokalen offiziellen CSV-Import der Bundesnetzagentur umgestellt,
+  Registerstand 01.09.2026 ausdrücklich in der Oberfläche. Importskript für
+  weitere Rechner ergänzt; Datei in data/ bleibt von Git ausgeschlossen.
+- Echter Backendtest: Berlin/15 km liefert 500 angezeigte Einträge mit
+  Begrenzung; Detmold/5 km 75 Einträge. Keine Preis- oder Belegungsmeldungen.
+- 62 Standard-Backend- und 28 Frontend-Tests bestanden, Build/ESLint erfolgreich.
+- Gas bleibt wegen externer Overpass-Störung offen. Details: docs/elektro-gas.md.
+- Alle Änderungen nur lokal; GitHub-Upload erfordert ausdrückliche Zustimmung.
+
 ## Elektro/Gas-Standortsuche (22.10.2026)
 
 - Kraftstoffauswahl ergänzt: Benzin (E5/E10 ausdrücklich benannt), Diesel,

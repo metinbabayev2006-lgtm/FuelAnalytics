@@ -31,6 +31,6 @@ export function LocationButton({ onSelect, onStart, onBusyChange, disabled, requ
     catch { setBusy(false); onBusyChange(false); setMessage('Standortzugriff ist hier nicht möglich. Bitte suche einen Ort manuell.') }
   }
   return <div className="location-device"><button type="button" disabled={disabled || busy} onClick={locate}>{busy ? 'Standort wird ermittelt …' : 'Meinen Standort verwenden'}</button>
-    <p className="last-checked">Nur auf Klick und mit Browserfreigabe. Dein Standort wird nicht als Favorit gespeichert. Erst die Preis- oder Standortsuche sendet den Suchmittelpunkt an unser Backend und den jeweiligen Anbieter: Tankerkönig für Benzin/Diesel, Overpass für Elektro/Gas.</p>
+    <p className="last-checked">Nur auf Klick und mit Browserfreigabe. Dein Standort wird nicht als Favorit gespeichert. Erst die Preis- oder Standortsuche sendet den Suchmittelpunkt an unser Backend. Benzin/Diesel fragen Tankerkönig ab, Gas nutzt Overpass. Elektro wird lokal im importierten Register gesucht; dabei werden keine Suchkoordinaten an einen Anbieter übertragen.</p>
     {message && <p role="status">{message}</p>}</div>
 }

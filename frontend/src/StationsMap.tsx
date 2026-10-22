@@ -63,16 +63,17 @@ export function StationsMap({ entries, fuel, center, radiusKm, observedAt, demo 
       const price = siteMode ? undefined : entry.prices[fuel]
       const label = siteMode ? (entry.services?.join(' / ') ?? fuelNames[fuel]) : price === undefined ? '—' : priceFormat.format(price)
       const priceLabel = document.createElement('span')
-      priceLabel.textContent = label
+      priceLabel.textContent = siteMode ? '' : label
       const icon = L.divIcon({
         html: priceLabel,
         className: `station-price-marker${siteMode ? ` energy-marker ${fuel}` : price === undefined ? ' unavailable' : ''}`,
-        iconSize: [siteMode ? 90 : 68, 30], iconAnchor: [siteMode ? 45 : 34, 15],
+        iconSize: siteMode ? [14, 14] : [68, 30], iconAnchor: siteMode ? [7, 7] : [34, 15],
       })
       const marker = L.marker([entry.station.latitude, entry.station.longitude], {
         icon, title: `${entry.station.name} · ${fuelNames[fuel]}: ${siteMode ? label : price === undefined ? 'Nicht verfügbar' : label + ' €/Liter'}`,
         alt: entry.station.name, keyboard: true,
       }).addTo(layer)
+      if (siteMode) marker.bindTooltip(`${entry.station.name} · ${label}`)
       // Provider text is inserted as text nodes, never interpolated into HTML.
       const popup = document.createElement('div')
       const title = document.createElement('strong')

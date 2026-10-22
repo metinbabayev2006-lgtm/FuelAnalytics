@@ -33,8 +33,8 @@ Die Anwendung ist für den lokalen Entwicklungsbetrieb eingerichtet.
 Ortsnamen werden über Open-Meteo/GeoNames, deutsche PLZ über
 Zippopotam.us/GeoNames aufgelöst.
 
-Zusätzlich lassen sich Elektro-Ladestationen und Gas-Tankstellen (LPG/CNG)
-aus OpenStreetMap in Liste und Karte suchen. Diese Standortansicht zeigt
+Zusätzlich lassen sich Elektro-Ladestationen aus dem offiziellen Register der
+Bundesnetzagentur und Gas-Tankstellen (LPG/CNG) aus OpenStreetMap in Liste und Karte suchen. Diese Standortansicht zeigt
 keine Live-Preise oder Ladeplatzbelegung. Details, Datenquelle und aktueller
 Live-Teststatus stehen in [Elektro und Gas](docs/elektro-gas.md).
 
@@ -64,6 +64,10 @@ Set-Location ..
 ```
 
 ### 2. Datenbank starten
+
+Für die Elektro-Suche einmalig im Projektordner `./Import-ChargingRegister.ps1`
+ausführen. Das lädt den offiziellen Registerbestand lokal nach `data/`; er wird
+nicht mit Git synchronisiert. Der Registerstand wird in der Oberfläche angezeigt.
 
 Im Projektordner:
 
