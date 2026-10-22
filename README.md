@@ -33,6 +33,11 @@ Die Anwendung ist für den lokalen Entwicklungsbetrieb eingerichtet.
 Ortsnamen werden über Open-Meteo/GeoNames, deutsche PLZ über
 Zippopotam.us/GeoNames aufgelöst.
 
+Zusätzlich lassen sich Elektro-Ladestationen und Gas-Tankstellen (LPG/CNG)
+aus OpenStreetMap in Liste und Karte suchen. Diese Standortansicht zeigt
+keine Live-Preise oder Ladeplatzbelegung. Details, Datenquelle und aktueller
+Live-Teststatus stehen in [Elektro und Gas](docs/elektro-gas.md).
+
 ## Lokal starten (Windows / PowerShell)
 
 Voraussetzungen: JDK 21, Node.js 24 mit npm und laufendes Docker Desktop mit

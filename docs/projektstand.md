@@ -1,5 +1,18 @@
 # Projektstand
 
+## Elektro/Gas-Standortsuche (22.10.2026)
+
+- Kraftstoffauswahl ergänzt: Benzin (E5/E10 ausdrücklich benannt), Diesel,
+  Elektro und Gas (LPG/CNG). Neue Standortansicht mit Karte, Liste, Entfernung,
+  Sortierung und Routenlinks; bekannte Anschlüsse und Öffnungszeiten als OSM-Angaben.
+- Keine erfundenen Preise oder Belegungsdaten. Bestehende Preisverläufe und
+  Datenbank unverändert; separate Standort-API mit begrenztem Cache und Abruflimit.
+- 57 Standard-Backend-Tests und 27 Frontend-Tests bestanden, Produktionsbuild
+  und ESLint erfolgreich. Browser-Komponentenprüfung mit markierten Testdaten.
+- Live-Abruf der Standorte noch nicht erfolgreich: externe Server lieferten
+  HTTP 406 bzw. Zeitlimits. Diese Einschränkung bleibt ausdrücklich offen.
+  Details: docs/elektro-gas.md.
+
 ## Erledigt
 
 - Java 21, Git, Node.js, npm, Docker Engine, Docker Compose und VS Code geprüft.

@@ -67,6 +67,12 @@ Datenbanktabellen.
 
 ## Datenmodell
 
+Die ergänzende Elektro/Gas-Suche verwendet `EnergySearchController`,
+`EnergyLocationClient` und `EnergySearchResult`. Sie liest OSM-Standorte über
+Overpass und verwendet einen begrenzten Speicher-Cache. Dafür werden keine
+zusätzlichen Datenbanktabellen oder Preisbeobachtungen erzeugt. Details und
+Prüfgrenzen: [Elektro und Gas](elektro-gas.md).
+
 ```mermaid
 erDiagram
     station ||--o{ price_observation : besitzt

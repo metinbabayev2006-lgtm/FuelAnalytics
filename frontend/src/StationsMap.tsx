@@ -5,19 +5,21 @@ import { routeUrl } from './stationActions'
 
 type MapEntry = {
   station: { id: string; name: string; latitude: number; longitude: number }
-  open: boolean
+  open: boolean | null
+  services?: string[]
+  details?: string[]
   prices: Partial<Record<'diesel' | 'e5' | 'e10', number>>
 }
 type Props = {
   entries: MapEntry[]
-  fuel: 'diesel' | 'e5' | 'e10'
+  fuel: 'diesel' | 'e5' | 'e10' | 'electric' | 'gas'
   center: { latitude: number; longitude: number }
   radiusKm: number
   observedAt: string
   demo?: boolean
 }
 
-const fuelNames = { diesel: 'Diesel', e5: 'Super E5', e10: 'Super E10' }
+const fuelNames = { diesel: 'Diesel', e5: 'Super E5', e10: 'Super E10', electric: 'Elektro', gas: 'Gas (LPG / CNG)' }
 const priceFormat = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
 
 export function StationsMap({ entries, fuel, center, radiusKm, observedAt, demo = false }: Props) {
@@ -57,17 +59,18 @@ export function StationsMap({ entries, fuel, center, radiusKm, observedAt, demo 
     if (!layer) return
     layer.clearLayers()
     for (const entry of entries) {
-      const price = entry.prices[fuel]
-      const label = price === undefined ? '—' : priceFormat.format(price)
+      const siteMode = fuel === 'electric' || fuel === 'gas'
+      const price = siteMode ? undefined : entry.prices[fuel]
+      const label = siteMode ? (entry.services?.join(' / ') ?? fuelNames[fuel]) : price === undefined ? '—' : priceFormat.format(price)
       const priceLabel = document.createElement('span')
       priceLabel.textContent = label
       const icon = L.divIcon({
         html: priceLabel,
-        className: `station-price-marker${price === undefined ? ' unavailable' : ''}`,
-        iconSize: [68, 30], iconAnchor: [34, 15],
+        className: `station-price-marker${siteMode ? ` energy-marker ${fuel}` : price === undefined ? ' unavailable' : ''}`,
+        iconSize: [siteMode ? 90 : 68, 30], iconAnchor: [siteMode ? 45 : 34, 15],
       })
       const marker = L.marker([entry.station.latitude, entry.station.longitude], {
-        icon, title: `${entry.station.name} · ${fuelNames[fuel]}: ${price === undefined ? 'Nicht verfügbar' : label + ' €/Liter'}`,
+        icon, title: `${entry.station.name} · ${fuelNames[fuel]}: ${siteMode ? label : price === undefined ? 'Nicht verfügbar' : label + ' €/Liter'}`,
         alt: entry.station.name, keyboard: true,
       }).addTo(layer)
       // Provider text is inserted as text nodes, never interpolated into HTML.
@@ -75,15 +78,18 @@ export function StationsMap({ entries, fuel, center, radiusKm, observedAt, demo 
       const title = document.createElement('strong')
       title.textContent = entry.station.name
       const priceText = document.createElement('p')
-      priceText.textContent = `${fuelNames[fuel]}: ${price === undefined ? 'Nicht verfügbar' : label + ' €/Liter'}`
+      priceText.textContent = siteMode ? `Angebot: ${label}` : `${fuelNames[fuel]}: ${price === undefined ? 'Nicht verfügbar' : label + ' €/Liter'}`
       const openText = document.createElement('p')
-      openText.textContent = entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'
+      openText.textContent = entry.open === null ? 'Preis und aktuelle Verfügbarkeit unbekannt' : entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'
       popup.append(title, priceText, openText)
+      for (const detail of entry.details ?? []) {
+        const text = document.createElement('p'); text.textContent = detail; popup.append(text)
+      }
       const href = routeUrl(entry.station)
       if (href && !demo) {
         const route = document.createElement('a')
         route.href = href; route.target = '_blank'; route.rel = 'noopener noreferrer'; route.referrerPolicy = 'no-referrer'
-        route.textContent = 'Route zur Tankstelle ↗'
+        route.textContent = siteMode ? 'Route zum Standort ↗' : 'Route zur Tankstelle ↗'
         route.setAttribute('aria-label', `Route zu ${entry.station.name} in Google Maps (neuer Tab)`)
         popup.append(route)
       }
@@ -104,13 +110,13 @@ export function StationsMap({ entries, fuel, center, radiusKm, observedAt, demo 
   }, [center.latitude, center.longitude, radiusKm, observedAt, demo])
 
   return <section className="map-section" aria-labelledby="map-title">
-    <h4 id="map-title">Tankstellen auf der Karte</h4>
-    <p className="last-checked">Markierungen zeigen {fuelNames[fuel]} in €/Liter. Anklicken für Details. Der Kreis zeigt den Suchradius, der blaue Punkt den Mittelpunkt.</p>
+    <h4 id="map-title">{fuel === 'electric' ? 'Ladestationen' : fuel === 'gas' ? 'Gastankstellen' : 'Tankstellen'} auf der Karte</h4>
+    <p className="last-checked">{fuel === 'electric' || fuel === 'gas' ? 'Markierungen zeigen die Energieart, keine Preise.' : `Markierungen zeigen ${fuelNames[fuel]} in €/Liter.`} Anklicken für Details. Der Kreis zeigt den Suchradius, der blaue Punkt den Mittelpunkt.</p>
     <div ref={container} className={`station-map${demo ? ' demo-map' : ''}`} role="region" aria-label={demo ? 'Schematische Karte fiktiver Tankstellen ohne Straßenhintergrund' : 'Interaktive Karte der gefundenen Tankstellen'} />
     {tileError && <p role="status" className="loading">Einige Kartenkacheln konnten nicht geladen werden. Die Tankstellen stehen weiterhin in der Tabelle.</p>}
     <button type="button" onClick={() => { if (bounds.current) map.current?.fitBounds(bounds.current, { padding: [24, 24], maxZoom: 15 }) }}>
       Suchgebiet anzeigen
     </button>
-    <p className="last-checked">— bedeutet: Preis nicht verfügbar. {demo ? 'Schematisches Koordinatengitter, keine Straßenkarte. Alle Tankstellen sind fiktiv; es werden keine Kartenkacheln geladen.' : <>Kartenhintergrund: OpenStreetMap. <a href="https://www.openstreetmap.org/fixthemap">Kartenfehler melden</a>. Routenlinks öffnen Google Maps und übermitteln nur die Zielkoordinaten; Startpunkt dort wählen.</>}</p>
+    <p className="last-checked">{fuel === 'electric' || fuel === 'gas' ? 'Keine Live-Preise oder Belegungsdaten.' : '— bedeutet: Preis nicht verfügbar.'} {demo ? 'Schematisches Koordinatengitter, keine Straßenkarte. Alle Tankstellen sind fiktiv; es werden keine Kartenkacheln geladen.' : <>Kartenhintergrund: OpenStreetMap. <a href="https://www.openstreetmap.org/fixthemap">Kartenfehler melden</a>. Routenlinks öffnen Google Maps und übermitteln nur die Zielkoordinaten; Startpunkt dort wählen.</>}</p>
   </section>
 }

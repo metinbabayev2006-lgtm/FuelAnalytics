@@ -1,4 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { EnergyResults } from './EnergyResults'
+import { validEnergyResult } from './energyTypes'
+import type { EnergyKind, EnergyResult } from './energyTypes'
 import { StationsMap } from './StationsMap'
 import { PriceSummary } from './PriceSummary'
 import { StationFillCost, TankCalculator } from './TankCalculator'
@@ -55,6 +58,8 @@ export function LiveSearch() {
 
 function SearchWorkspace({ demo }: { demo: boolean }) {
   const [fuel, setFuel] = useState<Fuel>('e10')
+  const [energy, setEnergy] = useState<EnergyKind | null>(null)
+  const [energyResult, setEnergyResult] = useState<(EnergyResult & { center: Location; radiusKm: number; searchLabel: string }) | null>(null)
   const [sort, setSort] = useState('price')
   const [tankAmount, setTankAmount] = useState('40')
   const [historyStationId, setHistoryStationId] = useState<string | null>(null)
@@ -75,6 +80,30 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
     const timer = window.setInterval(() => setRemaining(Math.max(0, Math.ceil((nextRequest.current - Date.now()) / 1000))), 1000)
     return () => { window.clearInterval(timer); activeRequest.current?.abort() }
   }, [])
+
+  async function searchEnergy() {
+    if (demo || !location || !energy || activeRequest.current) return
+    const controller = new AbortController()
+    activeRequest.current = controller
+    setLoading(true); setError('')
+    const timeout = window.setTimeout(() => controller.abort(), 35_000)
+    try {
+      const response = await fetch('/api/energy/search', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
+        body: JSON.stringify({ latitude: location.latitude, longitude: location.longitude, radiusKm, kind: energy }),
+      })
+      if (!response.ok) throw new Error(response.status === 429 ? 'Bitte warte kurz. Der Standortdienst begrenzt Anfragen.'
+        : response.status === 504 ? 'Der Standortdienst hat zu lange gebraucht. Versuche später einen kleineren Radius.'
+          : 'Der Standortdienst ist derzeit nicht verfügbar. Bitte später erneut versuchen.')
+      const data: unknown = await response.json()
+      if (!validEnergyResult(data) || data.kind !== energy) throw new Error('Der Standortdienst hat unerwartete Daten geliefert.')
+      setEnergyResult({ ...data, center: location, radiusKm, searchLabel: locationLabel(location) })
+    } catch (cause) {
+      setError(controller.signal.aborted ? 'Die Standortsuche hat zu lange gedauert.' : cause instanceof Error ? cause.message : 'Die Standortsuche ist fehlgeschlagen.')
+    } finally {
+      window.clearTimeout(timeout); activeRequest.current = null; setLoading(false)
+    }
+  }
 
   async function search() {
     if (demo || !location || activeRequest.current || Date.now() < nextRequest.current) return
@@ -130,7 +159,7 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
 
   return <section className="live-card" aria-labelledby="live-title">
     <div className="search-panel" id="search-panel">
-    <div className="section-heading"><div><p className="section-kicker">01 / DEINE SUCHE</p><h2 id="live-title">Wo möchtest du tanken?</h2></div><span className="live-badge"><span />{demo ? 'Synthetische Beispieldaten' : 'Daten von Tankerkönig'}</span></div>
+    <div className="section-heading"><div><p className="section-kicker">01 / DEINE SUCHE</p><h2 id="live-title">Wo möchtest du tanken?</h2></div><span className="live-badge"><span />{demo ? 'Synthetische Beispieldaten' : energy ? 'Standorte aus OpenStreetMap' : 'Daten von Tankerkönig'}</span></div>
     <div className="search-workspace">
     <LocationPicker selected={location} onSelect={setLocation} disabled={loading || demo} locating={locating} onLocationBusy={setLocating} />
     <div className="search-options"><h3><span className="step-number">2</span> Suche eingrenzen</h3>
@@ -139,22 +168,28 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
       <label>Suchradius<select disabled={loading || demo} value={radiusKm} onChange={event => setRadiusKm(Number(event.target.value))}>
         {[1, 2, 5, 10, 15, 25].map(radius => <option key={radius} value={radius}>{radius} km</option>)}
       </select></label>
-      <label>Kraftstoff<select value={fuel} onChange={event => setFuel(event.target.value as Fuel)}>
-        <option value="e10">Super E10</option><option value="e5">Super E5</option><option value="diesel">Diesel</option>
+      <label>Kraftstoff<select disabled={loading} value={energy ?? fuel} onChange={event => {
+        const value = event.target.value
+        setError('')
+        if (value === 'electric' || value === 'gas') { setEnergy(value); setSort('distance') }
+        else { setEnergy(null); setFuel(value as Fuel); setSort('price') }
+      }}>
+        <option value="e10">Benzin · Super E10</option><option value="e5">Benzin · Super E5</option><option value="diesel">Diesel</option>
+        <option value="electric" disabled={demo}>Elektro · Ladestationen</option><option value="gas" disabled={demo}>Gas · LPG / CNG</option>
       </select></label>
       <label>Sortieren nach<select value={sort} onChange={event => setSort(event.target.value)}>
-        <option value="price">Preis, günstigster zuerst</option><option value="distance">Entfernung, nächste zuerst</option>
+        {!energy && <option value="price">Preis, günstigster zuerst</option>}<option value="distance">Entfernung, nächste zuerst</option>{energy && <option value="name">Name, A–Z</option>}
       </select></label>
     </div>
-    <button className="search-submit" disabled={demo || !location || loading || remaining > 0} onClick={() => void search()}>
-      {loading ? 'Preise werden abgerufen …' : remaining > 0 ? `Erneut möglich in ${remaining} s` : 'Preise abrufen'}
+    <button className="search-submit" disabled={demo || !location || loading || locating || (!energy && remaining > 0)} onClick={() => void (energy ? searchEnergy() : search())}>
+      {loading ? 'Wird abgerufen …' : energy ? 'Standorte suchen' : remaining > 0 ? `Erneut möglich in ${remaining} s` : 'Preise abrufen'}
       <Icon name="arrow" /></button>
-    <p className="last-checked">Abruf auf Klick. Danach frei vergleichen und sortieren.</p>
+    <p className="last-checked">{energy ? 'Echte Standorte mit Entfernung und Route. Keine Live-Preise oder Belegung. Gas wird getrennt als LPG bzw. CNG gekennzeichnet.' : 'Abruf auf Klick. Danach frei vergleichen und sortieren.'}</p>
     </div></div>
-    {loading && <p role="status">Tankstellen werden abgerufen und in der Datenbank gespeichert …</p>}
+    {loading && <p role="status">{energy ? 'Standorte werden aus OpenStreetMap abgerufen …' : 'Tankstellen werden abgerufen und in der Datenbank gespeichert …'}</p>}
     {error && <p role="alert" className="error">{error}</p>}
     </div>
-    <details className="favorites-panel"><summary>Meine Favoriten ({favorites.favorites.length})</summary>
+    {!energy && <><details className="favorites-panel"><summary>Meine Favoriten ({favorites.favorites.length})</summary>
       <p className="last-checked">Nur in diesem Browser gespeichert, ohne Preise. Demo-Favoriten sind von echten Favoriten getrennt.</p>
       {favorites.message && <p role="status">{favorites.message}</p>}
       {favorites.favorites.length === 0 ? <p>Noch keine Favoriten. Merke eine Tankstelle in der Ergebnisliste.</p> : <ul>{favorites.favorites.map(station => <li key={station.id}>
@@ -164,7 +199,12 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
           <button type="button" onClick={() => favorites.toggle(station)} aria-label={`Favorit ${station.name} entfernen`}>Entfernen</button></div>
       </li>)}</ul>}
     </details>
+    </>}
     <div id="results" className="results-area">
+    {energy && (energyResult?.kind === energy ? <EnergyResults result={energyResult} center={energyResult.center} radiusKm={energyResult.radiusKm} searchLabel={energyResult.searchLabel} sort={sort}
+      stale={loading || !!error || radiusKm !== energyResult.radiusKm || location?.latitude !== energyResult.center.latitude || location?.longitude !== energyResult.center.longitude} />
+      : <div className="empty-state"><div><p className="section-kicker">{energy === 'electric' ? 'ELEKTRO' : 'GAS · LPG / CNG'}</p><h3>{energy === 'electric' ? 'Finde Ladestationen in deiner Nähe.' : 'Finde passende Gastankstellen.'}</h3><p>Wähle einen Ort und klicke auf „Standorte suchen“. Die Ergebnisse erscheinen in Liste und Karte. Preise werden für diese Energiearten nicht geliefert.</p></div></div>)}
+    {!energy && <>
     {!result && <div className="empty-state"><div className="empty-orbit" aria-hidden="true"><span /><span /><Icon name="fuel" /></div><div><p className="section-kicker">DEIN NÄCHSTER TANKSTOPP</p><h3>Ein guter Preis beginnt<br />mit einem guten Überblick.</h3><p>Wähle oben einen Ort und rufe die Preise ab.<br />Hier erscheinen dein Preisvergleich und die Tankstellenkarte.</p></div><span className="empty-caption">SUCHEN → VERGLEICHEN → ENTSCHEIDEN</span></div>}
     {result && <>
       <div className="section-heading result-heading"><div><p className="section-kicker">02 / DEIN PREISÜBERBLICK</p><h3>{result.searchLabel} <span className="radius-badge">{result.radiusKm} km Umkreis</span></h3></div><p className="result-count"><strong>{result.stations.length}</strong> Tankstellen gefunden</p></div>
@@ -194,14 +234,16 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
         </table>
       </div>}</section></div>
     </>}
+    </>}
     </div>
-      <div id="history-area"><Suspense fallback={<p role="status">Diagramm wird geladen …</p>}>
+      {!energy && <><div id="history-area"><Suspense fallback={<p role="status">Diagramm wird geladen …</p>}>
         {result && <>
         {result.stations.filter(entry => entry.station.id === historyStationId).map(entry =>
           <PriceHistory key={entry.station.id} station={entry.station} availableStations={historyStations} fuel={fuel} observedAt={result.observedAt} loadSeries={loadDemoSeries} demo={demo} />)}
         </>}
       </Suspense></div>
       {!historyStationId && <div className="history-placeholder"><Icon name="chart" /><div><h3>Jeder Abruf erzählt ein Stück mehr.</h3><p>Wähle nach deiner Suche bei einer Tankstelle „Preisverlauf ansehen“, um gespeicherte Beobachtungen zu vergleichen.</p></div></div>}
-    <p className="source-footer">{demo ? 'Synthetische Vorführdaten · keine echten Preise oder Tankstellen.' : <>Quelle: <a href="https://creativecommons.tankerkoenig.de/">Tankerkönig / MTS-K</a> · <a href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a>. Preise können sich seit dem Abruf geändert haben.</>}</p>
+    </>}
+    {!energy && <p className="source-footer">{demo ? 'Synthetische Vorführdaten · keine echten Preise oder Tankstellen.' : <>Quelle: <a href="https://creativecommons.tankerkoenig.de/">Tankerkönig / MTS-K</a> · <a href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a>. Preise können sich seit dem Abruf geändert haben.</>}</p>}
   </section>
 }

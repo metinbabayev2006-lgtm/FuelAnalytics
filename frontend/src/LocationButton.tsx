@@ -20,7 +20,7 @@ export function LocationButton({ onSelect, onStart, onBusyChange, disabled, requ
         setMessage('Der Browser hat keinen gültigen Standort geliefert.')
       } else {
         onSelect({ id: -1, name: 'Mein aktueller Standort', region: null, district: null, latitude, longitude })
-        setMessage(`Standort ausgewählt${Number.isFinite(accuracy) ? ` · Genauigkeit ungefähr ${Math.round(accuracy)} m` : ''}. Klicke zum Suchen auf „Preise abrufen“.`)
+        setMessage(`Standort ausgewählt${Number.isFinite(accuracy) ? ` · Genauigkeit ungefähr ${Math.round(accuracy)} m` : ''}. Starte jetzt die Preis- oder Standortsuche.`)
       }
       setBusy(false); onBusyChange(false)
     }, error => {
@@ -31,6 +31,6 @@ export function LocationButton({ onSelect, onStart, onBusyChange, disabled, requ
     catch { setBusy(false); onBusyChange(false); setMessage('Standortzugriff ist hier nicht möglich. Bitte suche einen Ort manuell.') }
   }
   return <div className="location-device"><button type="button" disabled={disabled || busy} onClick={locate}>{busy ? 'Standort wird ermittelt …' : 'Meinen Standort verwenden'}</button>
-    <p className="last-checked">Nur auf Klick und mit Browserfreigabe. Dein Standort wird nicht als Favorit gespeichert. Erst „Preise abrufen“ sendet den Suchmittelpunkt an unser Backend und Tankerkönig.</p>
+    <p className="last-checked">Nur auf Klick und mit Browserfreigabe. Dein Standort wird nicht als Favorit gespeichert. Erst die Preis- oder Standortsuche sendet den Suchmittelpunkt an unser Backend und den jeweiligen Anbieter: Tankerkönig für Benzin/Diesel, Overpass für Elektro/Gas.</p>
     {message && <p role="status">{message}</p>}</div>
 }

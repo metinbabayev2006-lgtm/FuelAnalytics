@@ -68,7 +68,7 @@ function App() {
       <main className="app" id="main-content">
       <section className="hero" aria-labelledby="page-title">
         <div><p className="eyebrow"><span /> KRAFTSTOFFPREISE IN DEUTSCHLAND</p><h1 id="page-title">Besser tanken.<br /><span>Klarer entscheiden.</span></h1><p className="intro">Dein nächster Tankstopp, gut informiert.<br className="desktop-break" /> Preise vergleichen. Unterschiede sehen. Entwicklungen verstehen.</p></div>
-        <div className="hero-aside"><Icon name="map" /><span>Deine Umgebung.<br /><strong>Dein Preisvergleich.</strong></span><p>Ein Ort. Drei Kraftstoffe.<br />Alle Ergebnisse auf einen Blick.</p></div>
+        <div className="hero-aside"><Icon name="map" /><span>Deine Umgebung.<br /><strong>Dein Preisvergleich.</strong></span><p>Benzin, Diesel, Elektro und Gas.<br />Alle Ergebnisse auf einen Blick.</p></div>
       </section>
       <LiveSearch />
       <div className="project-tools">
