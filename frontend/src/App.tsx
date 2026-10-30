@@ -3,24 +3,22 @@ import './App.css'
 import { LiveSearch } from './LiveSearch'
 import { Icon } from './Icon'
 import { SavedHistory } from './SavedHistory'
-import { NationalLpg } from './NationalLpg'
 
 type ConnectionState = 'loading' | 'connected' | 'error'
-type View = 'search' | 'history' | 'lpg'
+type View = 'search' | 'history'
 function viewForHash(hash: string): View {
-  return hash === '#saved-history' ? 'history' : hash === '#lpg-statistics' ? 'lpg' : 'search'
+  return ['#saved-history', '#history-monthly', '#lpg-statistics'].includes(hash) ? 'history' : 'search'
 }
 const pages = {
   search: { title: 'Tankstellen in deiner Nähe', description: 'Ort auswählen, Preise vergleichen und die passende Tankstelle finden.' },
-  history: { title: 'Deine gespeicherten Preise', description: 'Sieh nach, wie sich die Preise deiner Tankstellen entwickelt haben.' },
-  lpg: { title: 'LPG-Preise in Deutschland', description: 'Offizielle Durchschnittspreise und ihre Entwicklung seit 2005.' },
+  history: { title: 'Preisverläufe vergleichen', description: 'Eigene Messungen, historische Monatswerte und LPG-Durchschnittspreise für Deutschland.' },
 }
 
 
 function App() {
   const [view, setView] = useState<View>(() => viewForHash(window.location.hash))
   useEffect(() => {
-    const navigate = () => { if (['#search-panel', '#results', '#history-area', '#saved-history', '#lpg-statistics'].includes(window.location.hash)) { setView(viewForHash(window.location.hash)); window.scrollTo(0, 0) } }
+    const navigate = () => { if (['#search-panel', '#results', '#history-area', '#saved-history', '#history-monthly', '#lpg-statistics'].includes(window.location.hash)) { setView(viewForHash(window.location.hash)); window.scrollTo(0, 0) } }
     window.addEventListener('hashchange', navigate)
     return () => window.removeEventListener('hashchange', navigate)
   }, [])
@@ -85,7 +83,6 @@ function App() {
           <nav className="main-nav" aria-label="Hauptnavigation">
             <a href="#search-panel" aria-current={view === 'search' ? 'page' : undefined} onClick={event => { event.preventDefault(); selectPage('search', '#search-panel') }}><Icon name="search" />Tankstellen</a>
             <a href="#saved-history" aria-current={view === 'history' ? 'page' : undefined} onClick={event => { event.preventDefault(); selectPage('history', '#saved-history') }}><Icon name="chart" />Preisverlauf</a>
-            <a href="#lpg-statistics" aria-current={view === 'lpg' ? 'page' : undefined} onClick={event => { event.preventDefault(); selectPage('lpg', '#lpg-statistics') }}><Icon name="layers" />LPG-Übersicht</a>
           </nav>
           <a className={'connection-pill ' + connection} href="#system-status" onClick={() => setStatusExpanded(true)}>
             <span />{connection === 'connected' ? 'Verbunden' : connection === 'loading' ? 'Verbinde …' : 'Nicht verbunden'}
@@ -97,7 +94,6 @@ function App() {
         {/* Keep each workspace mounted so navigation preserves searches, selections and API cooldowns. */}
         <div className="page-view" hidden={view !== 'search'}><LiveSearch /></div>
         <div className="page-view" hidden={view !== 'history'}><SavedHistory /></div>
-        <div className="page-view" hidden={view !== 'lpg'}><NationalLpg /></div>
         <details className="system-details" id="system-status" open={statusExpanded} onToggle={event => setStatusExpanded(event.currentTarget.open)}>
           <summary>Verbindungsdetails</summary>
           <section className="connection-card" aria-labelledby="connection-title">

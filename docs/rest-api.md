@@ -1,5 +1,41 @@
 # REST-API: gespeicherte Daten
 
+## Tankerkönig-Archiv (zeitgewichtete Intervalle, lokal)
+
+- `GET /api/history/archive/status`: `available` sowie bei vorhandenem Import
+  `periodStart`, `periodEnd` (exklusiv, Berlin), Quelle, Lizenz, Importzeitpunkt,
+  Anzahl der Quelldateitage einschließlich Starttag und verfügbare Städte.
+- `GET /api/history/archive/stations?city=Detmold&fuelType=e10&offset=0`:
+  höchstens 100 Treffer, `entries`/`hasMore`, Monatszahl mit bekannten Preisen.
+- `GET /api/history/archive/series?fuelType=e10&stationIds=UUID,UUID`:
+  bis zu drei verschiedene Tankstellen, Metadaten, Kraftstoff,
+  `aggregation=time_weighted_known_intervals` und monatliche Serien.
+  Jeder Punkt enthält `month`, `meanPrice` (€/l, null ohne bekannte Intervalle),
+  `knownSeconds`, `totalSeconds`. Ein Teilmittel darf nicht als vollständig
+  bekannter Monatswert dargestellt werden.
+
+400 bei ungültigem Kraftstoff, UUID, doppelter/zu großer Tankstellenauswahl
+oder ungültiger Seiteneingabe. 404 ohne importiertes Archiv bzw. ohne Verlauf
+für die ausgewählte Station/Kraftstoffkombination. Keine externen Aufrufe.
+[Import, Definition und Einschränkungen](tankerkoenig-archive.md).
+
+## Historische Monatsmittel (lokaler Import)
+
+- `GET /api/history/monthly/years`: tatsächlich importierte Jahre, absteigend.
+- `GET /api/history/monthly/stations?year=2022&fuelType=e10&city=Detmold&offset=0`:
+  `entries` und `hasMore`, maximal 100 Tankstellen pro Seite mit vorhandenen
+  Monatszahlen. Exakter Stadtname, ohne Beachtung der Groß-/Kleinschreibung.
+- `GET /api/history/monthly/series?year=2022&fuelType=e10&stationIds=UUID,UUID`:
+  bis zu drei verschiedene Tankstellen. Antwort enthält Jahr, Kraftstoff,
+  `aggregation=monthly_source_mean`, `unit=EUR/l`, Herkunft, Importzeitpunkt
+  und Serien mit `month` (erster Kalendertag) und `meanPrice`.
+
+Gültige Kraftstoffe: `diesel`, `e5`, `e10`; Jahre 2000–2100. Ungültige Eingaben
+führen zu 400, unbekannte importierte Jahre oder fehlende Serien zu 404.
+Fehlende Monate werden nicht ergänzt. Diese Endpunkte lesen ausschließlich
+PostgreSQL und rufen keine externen Anbieter ab. Monatsmittel sind keine
+Einzelmessungen. [Import und Semantik](historical-monthly.md).
+
 Die GET-Tankstellenendpunkte lesen ausschließlich die eigene Datenbank.
 Die separate GET-Ortsauflösung verwendet externe Geodatenanbieter und einen Cache.
 Die POST-Umkreissuche ruft Tankerkönig ab und speichert validierte Ergebnisse.

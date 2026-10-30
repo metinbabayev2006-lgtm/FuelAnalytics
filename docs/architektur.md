@@ -1,5 +1,36 @@
 # Architektur und Datenmodell
 
+## Tankerkönig-Archiv mit zeitgewichteten Intervallen
+
+V5 ergänzt `archive_import`, `archive_station` und `archive_daily_price`.
+Ein Offline-Importer filtert tägliche Tankstellen-Snapshots auf fünf
+Präsentationsstädte, speichert zugehörige Rohänderungen als fortsetzbare lokale
+Checkpoints und bildet pro Kraftstoff tägliche Preisintegrale. Vollständige
+Validierung aller Quelldateitage geht der transaktionalen Veröffentlichung
+in PostgreSQL voraus. Ein zusätzlicher Vortag initialisiert Startpreise,
+soweit tatsächlich bekannt. Die Rohänderungen bleiben lokal für Neuberechnungen.
+
+`ArchiveHistoryController` validiert Leseanfragen. `ArchiveHistoryRepository`
+aggregiert Tagesintegrale zu Monatsmitteln, ermittelt erwartete Sekunden anhand
+der Berliner Kalendergrenzen und liefert Abdeckungszahlen. Das Frontend zeichnet
+nur vollständig bekannte Monatsmittel; Teilwerte stehen ausdrücklich in der
+Tabelle. Eigene Abrufmessungen und Kaggle-Quellmittel bleiben getrennt.
+Archivzugangsdaten gelangen nicht ins Frontend. Der Import ist ein manueller
+Vorgang, keine massenhafte Abfrage der Live-API und kein automatischer Scheduler.
+[Berechnung und Betrieb](tankerkoenig-archive.md).
+
+## Importierte historische Monatswerte
+
+Ein separater Archivbereich ergänzt die eigenen Abrufmessungen.
+`MonthlyHistoryController` validiert die Leseanfragen;
+`MonthlyHistoryRepository` liest über JDBC die Tabellen `historical_station`,
+`historical_monthly_import` und `historical_monthly_price` (Flyway V4).
+Die Monatsmittel werden offline durch ein transaktionales Python/COPY-Skript
+importiert. Herkunft, Lizenz, Dateiprüfsummen und Ausschlüsse bleiben gespeichert.
+Die Live-Tabellen bleiben unverändert. Im Frontend werden eigene Messungen und
+historische Monatsmittel ausdrücklich getrennt; fehlende Monate werden nicht
+ergänzt. [Datenmodell, Einschränkungen und Einrichtung](historical-monthly.md).
+
 ## Ziel und Umfang
 
 FuelAnalytics unterstützt den Vergleich von Tankstellenpreisen im gewählten

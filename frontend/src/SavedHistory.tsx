@@ -1,5 +1,8 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { NationalLpg } from './NationalLpg'
 import type { Fuel, HistoryStation } from './historyComparison'
+
+const HistoricalMonthly = lazy(() => import('./HistoryArchives').then(module => ({ default: module.HistoryArchives })))
 
 const PriceHistory = lazy(() => import('./PriceHistory').then(module => ({ default: module.PriceHistory })))
 type Entry = { station: HistoryStation; count: number; firstObservedAt: string; lastObservedAt: string }
@@ -13,7 +16,7 @@ function validEntry(value: unknown): value is Entry {
     Number.isFinite(Date.parse(row.firstObservedAt)) && Number.isFinite(Date.parse(row.lastObservedAt)) && Date.parse(row.firstObservedAt) <= Date.parse(row.lastObservedAt)
 }
 
-export function SavedHistory() {
+function ObservedHistory() {
   const [fuel, setFuel] = useState<Fuel>('e10')
   const [state, setState] = useState<{ entries: Entry[]; fuel: Fuel; offset: number; hasMore: boolean } | null>(null)
   const [selected, setSelected] = useState<Entry | null>(null)
@@ -32,10 +35,10 @@ export function SavedHistory() {
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Preisarchiv nicht erreichbar.')
     } finally { setLoading(false) }
   }
-  return <section className="saved-history secondary-panel" id="saved-history" aria-labelledby="saved-history-title">
+  return <section className="saved-history secondary-panel" id="observed-history" aria-labelledby="saved-history-title">
     <h2 id="saved-history-title">Tankstelle auswählen</h2>
     <p>Wähle einen Kraftstoff und lade deine gespeicherten Tankstellen. Dafür werden keine neuen Preise abgerufen.</p>
-    <details className="source-details"><summary>Welche Preise sind gespeichert?</summary><p className="last-checked">Benzin und Diesel: E5, E10 und Diesel werden bei erfolgreichen Preisabfragen gespeichert. Für LPG gibt es weiter unten eine separate Deutschland-Statistik. Für einzelne LPG/CNG- und Ladestationen liegen hier keine Preisverläufe vor. Vor Beginn der Datensammlung sind keine Preise verfügbar.</p></details>
+    <details className="source-details"><summary>Welche Preise sind gespeichert?</summary><p className="last-checked">Benzin und Diesel: E5, E10 und Diesel werden bei erfolgreichen Preisabfragen gespeichert. Bundesweite LPG-Durchschnittspreise findest du im Reiter „LPG Deutschland“. Für einzelne LPG/CNG- und Ladestationen liegen hier keine Preisverläufe vor. Historische Monatsdurchschnitte stehen im eigenen Reiter bereit.</p></details>
     <div className="search-controls"><label>Kraftstoff im Preisarchiv<select value={fuel} disabled={loading} onChange={event => { setFuel(event.target.value as Fuel); setState(null); setSelected(null); setError('') }}>
       <option value="e10">Super E10</option><option value="e5">Super E5</option><option value="diesel">Diesel</option>
     </select></label><button disabled={loading} onClick={() => void load()}>{loading ? 'Archiv wird geladen …' : 'Gespeicherte Tankstellen laden'}</button></div>
@@ -51,5 +54,39 @@ export function SavedHistory() {
       {selected && <><p className="last-checked">Gespeicherter Zeitraum: {new Date(selected.firstObservedAt).toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })} bis {new Date(selected.lastObservedAt).toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })} (Berlin).</p>
         <Suspense fallback={<p role="status">Diagramm wird geladen …</p>}><PriceHistory key={selected.station.id + state.fuel} station={selected.station} availableStations={state.entries.map(entry => entry.station)} fuel={state.fuel} observedAt={selected.lastObservedAt} initialDays={0} /></Suspense></>}
     </>}
+  </section>
+}
+
+type HistoryMode = 'observed' | 'monthly' | 'lpg'
+const historyModeForHash = (): HistoryMode => window.location.hash === '#lpg-statistics' ? 'lpg' : window.location.hash === '#history-monthly' ? 'monthly' : 'observed'
+
+export function SavedHistory() {
+  const [mode, setMode] = useState<HistoryMode>(historyModeForHash)
+  const [monthlyOpened, setMonthlyOpened] = useState(() => historyModeForHash() === 'monthly')
+  useEffect(() => {
+    const navigate = () => {
+      if (!['#saved-history', '#history-monthly', '#lpg-statistics'].includes(window.location.hash)) return
+      const next = historyModeForHash()
+      setMode(next)
+      if (next === 'monthly') setMonthlyOpened(true)
+    }
+    window.addEventListener('hashchange', navigate)
+    return () => window.removeEventListener('hashchange', navigate)
+  }, [])
+  function selectMode(next: HistoryMode) {
+    setMode(next)
+    if (next === 'monthly') setMonthlyOpened(true)
+    const hash = next === 'lpg' ? '#lpg-statistics' : next === 'monthly' ? '#history-monthly' : '#saved-history'
+    if (window.location.hash !== hash) window.history.pushState({}, '', hash)
+  }
+  return <section id="saved-history" aria-label="Preisverlauf und Datenquelle">
+    <div className="history-source-switch" role="group" aria-label="Datenquelle für Preisverlauf">
+      <button aria-pressed={mode === 'observed'} onClick={() => selectMode('observed')}>Eigene Messungen</button>
+      <button aria-pressed={mode === 'monthly'} onClick={() => selectMode('monthly')}>Historische Monatswerte</button>
+      <button aria-pressed={mode === 'lpg'} onClick={() => selectMode('lpg')}>LPG Deutschland</button>
+    </div>
+    <div hidden={mode !== 'observed'}><ObservedHistory /></div>
+    <div hidden={mode !== 'monthly'}>{monthlyOpened && <Suspense fallback={<p role="status">Historisches Archiv wird geöffnet …</p>}><HistoricalMonthly /></Suspense>}</div>
+    <div hidden={mode !== 'lpg'}><NationalLpg /></div>
   </section>
 }

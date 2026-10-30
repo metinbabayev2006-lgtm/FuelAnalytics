@@ -1,5 +1,57 @@
 # Projektstand
 
+## Tankerkönig-Jahresarchiv importiert (30.10.2026, lokal)
+
+- Vollständig verarbeiteter Zeitraum: 01.10.2025 bis 01.10.2026 (exklusiv),
+  einschließlich eines Vortags zur Initialisierung: 366 Quelldateitage.
+- 673 historische Tankstellen, 734.607 tägliche Kraftstoffintegrale importiert.
+  Ortsbestand: Berlin 314, München 148, Frankfurt am Main 68, Köln 125,
+  Detmold 18. Nicht jede Station hat für jeden Kraftstoff bekannte Preise.
+- Wiederaufnahme aus Tages-Checkpoints erfolgreich: erneuter Aufruf verwendet
+  abgeschlossene Downloads und veröffentlicht erst das vollständig validierte Archiv.
+- Echte PostgreSQL-Abfragen für alle fünf Städte und für E10/E5/Diesel geprüft.
+  Vergleich AVIA/Aral Detmold zeigt Oktober 2025 bis September 2026, jeweils
+  zwölf vollständig bekannte Monatsmittel. Echte unvollständige Verläufe bleiben lückenhaft.
+- Vor/nach Import unverändert: 301 eigene Tankstellen, 3.055 eigene
+  Preisbeobachtungen und 526.373 ältere Kaggle-Monatswerte.
+- Backend: 82 Tests bestanden, 4 optionale PostgreSQL-Tests übersprungen;
+  zusätzlich echter V5-Import mit PostgreSQL. Frontend: 66 Tests, ESLint und
+  Produktionsbuild bestanden. Python: 8 Archiv- und 4 Kaggle-Importtests bestanden.
+- Backend/API und Diagramm in separater lokaler Testinstanz geprüft. Die ältere
+  IntelliJ-Instanz muss für die neuen Endpunkte neu gestartet werden; der Zugriff
+  auf IntelliJ per Computer Use wurde nicht freigegeben.
+- Zugangsdaten, Rohdaten und PostgreSQL bleiben lokal. Kein GitHub-Upload.
+  Anleitung: [Tankerkönig-Archiv](tankerkoenig-archive.md).
+
+## Gemeinsamer Preisverlauf und Archivzugang (30.10.2026, lokal)
+
+- Hauptnavigation auf Tankstellen/Preisverlauf gebündelt. Darunter drei Reiter:
+  Eigene Messungen, Historische Monatswerte und LPG Deutschland. Datenarten
+  bleiben getrennt, geöffnete Filter und Statistiken bleiben beim Wechsel erhalten.
+- Alte LPG-Direktlinks funktionieren weiter. Browserprüfung mit echten lokalen
+  LPG-Daten erfolgreich; 62 Frontendtests, ESLint und Produktionsbuild bestanden.
+- Persönlicher Tankerkönig-Archivzugang an einer aktuellen Preisdatei geprüft.
+  Zugangsdaten nur lokal in ignorierter `.env`; keine Geheimnisse in Git-Dateien.
+- Kein Repository-Klon und noch kein neuer Zwölfmonatsimport. Einzelheiten:
+  [Archivzugang und Importplanung](tankerkoenig-archive.md).
+- Kein GitHub-Upload.
+
+## Historischer Monatsvergleich (30.10.2026, lokal)
+
+- Kaggle-Datensatz v2, Jahr 2022, separat importiert: 15.323 Tankstellen,
+  526.373 gültige Diesel/E5/E10-Monatsmittel. Kein künstliches Auffüllen.
+- Umschaltbare Ansicht für eigene Messungen und historische Monatswerte,
+  Stadt-/Jahr-/Kraftstoffauswahl, bis zu drei Serien, Statistik und Tabelle.
+- Echte PostgreSQL-API für Detmold, Berlin, Hamburg, Bielefeld und Dortmund
+  geprüft. Browservergleich AVIA/Aral Detmold zeigt je zwölf variierende Monatswerte.
+- Eigene 301 Tankstellen und 2.938 Preisbeobachtungen vor/nach Import unverändert.
+- Backend: 78 Tests bestanden, 4 optionale PostgreSQL-Tests übersprungen.
+  Zusätzlich echter PostgreSQL-Import mit Flyway V4. Frontend: 61 Tests,
+  ESLint und Produktionsbuild erfolgreich. Alle vier Python-Importtests bestanden.
+- Nur lokal gespeichert, kein GitHub-Upload. Neuere zwölf Monate bleiben von
+  der angefragten Tankerkönig-Lieferung abhängig.
+- Anleitung und Quellen: [Historische Monatswerte](historical-monthly.md).
+
 ## Elektro-Suche nach Anbieter-Zeitlimit korrigiert (22.10.2026)
 
 - Overpass-Störung auch mit kleinen Abfragen bestätigt: Überlastung/Timeout.

@@ -10,7 +10,7 @@ OpenVan ist ein getrennter Vergleich unter CC BY 4.0: https://openvan.camp/de/de
 
 ## Bedienung und Statistik
 
-Links LPG Deutschland öffnen und LPG-Statistik laden. Zeitraum 1 Jahr, 5 Jahre oder gesamter Verlauf (jeweils bezogen auf den letzten vorhandenen EU-Wert). Diagramm, Tabelle, Minimum/Maximum und arithmetischer Durchschnitt der vorhandenen Wochenwerte; jede Woche zählt gleich. Kein zeit- oder absatzgewichteter Gesamtmarktpreis. Diagrammlinien verbinden Messpunkte, Zwischenwerte bleiben unbekannt.
+Preisverlauf → LPG Deutschland öffnen und LPG-Statistik laden. Zeitraum 1 Jahr, 5 Jahre oder gesamter Verlauf (jeweils bezogen auf den letzten vorhandenen EU-Wert). Diagramm, Tabelle, Minimum/Maximum und arithmetischer Durchschnitt der vorhandenen Wochenwerte; jede Woche zählt gleich. Kein zeit- oder absatzgewichteter Gesamtmarktpreis. Diagrammlinien verbinden Messpunkte, Zwischenwerte bleiben unbekannt. Der bisherige Direktlink #lpg-statistics öffnet weiterhin diese Ansicht.
 
 Gasstandorte bleiben aus OSM/Overpass. Kein nationaler LPG-Wert wird einem Kartenmarker oder einem Stationspreis zugeschrieben. Für CNG und Elektro wird kein Preis erfunden.
 

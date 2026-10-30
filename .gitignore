@@ -27,3 +27,7 @@ Thumbs.db
 # Lokale Daten und temporäre Ergebnisse
 /data/
 /tmp/
+
+# Python-Importskripte
+**/__pycache__/
+*.pyc

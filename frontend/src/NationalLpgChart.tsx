@@ -11,7 +11,7 @@ export function NationalLpgChart({ points }: { points: LpgPoint[] }) {
       <XAxis type="number" scale="time" dataKey="timestamp" domain={['dataMin', 'dataMax']} tickFormatter={date} minTickGap={55} />
       <YAxis domain={['auto', 'auto']} tickFormatter={value => price.format(Number(value))} width={75} />
       <Tooltip labelFormatter={date} formatter={value => [price.format(Number(value)) + ' €/Liter', 'LPG Deutschland']} />
-      <Line type="linear" dataKey="price" name="LPG Deutschland" stroke="#416c3b" strokeWidth={2} dot={points.length < 100} isAnimationActive={false} />
+      <Line type="linear" dataKey="price" name="LPG Deutschland" stroke="#087f70" strokeWidth={2} dot={points.length < 100} isAnimationActive={false} />
     </LineChart></ResponsiveContainer>
   </div>
 }

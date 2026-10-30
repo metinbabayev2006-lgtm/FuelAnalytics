@@ -1,8 +1,31 @@
 # FuelAnalytics
 
+## Tankerkönig: zwölf historische Monate für fünf Städte
+
+Die neue Archivansicht liegt unter **Preisverlauf → Historische Monatswerte →
+Tankerkönig · zwölf Monate**. Der konfigurierte Zeitraum reicht von Oktober
+2025 bis September 2026. Berlin, München, Frankfurt am Main, Köln und Detmold
+sind fest auswählbar. Zeitgewichtete Monatsmittel, Vergleich von bis zu drei
+Tankstellen sowie eine Tabelle mit bekannter Preisgültigkeitsdauer; Lücken
+werden nicht aufgefüllt. Ältere Kaggle-Jahre bleiben getrennt auswählbar.
+
+Der persönliche Archivzugang und die importierten Daten bleiben lokal. Anleitung,
+fortsetzbarer Import, Berechnung und Einschränkungen:
+[Tankerkönig-Archiv](docs/tankerkoenig-archive.md).
+
+## Historische Tankstellenpreise (30.10.2026)
+
+Unter **Preisverlauf → Historische Monatswerte** lassen sich importierte
+Monatsdurchschnitte aus 2022 für Diesel, E5 und E10 vergleichen, mit bis zu
+drei Tankstellen, Diagramm, Tabelle und Kennzahlen. Dies sind historische
+Monatsmittel, keine aktuellen zwölf Monate. Eigene Messungen bleiben separat.
+Der lokale Erstimport enthält 526.373 Monatswerte für 15.323 Tankstellen.
+Quellen, Lizenz, Einschränkungen und Einrichtung auf einem weiteren Rechner:
+[Historische Monatswerte](docs/historical-monthly.md).
+
 ## LPG-Statistik Deutschland (30.10.2026)
 
-Links **LPG Deutschland** öffnen und **LPG-Statistik laden** anklicken. Offizielle EU-Wochenwerte seit 2005, Diagramm und Kennzahlen; optionaler kostenloser OpenVan-Vergleich mit separater Speicherung. Dies sind nationale Durchschnittswerte, keine Preise einzelner Tankstellen. Bedienung, Quellen und Import: [LPG-Statistik](docs/lpg-statistics.md).
+**Preisverlauf → LPG Deutschland** öffnen und **LPG-Statistik laden** anklicken. Offizielle EU-Wochenwerte seit 2005, Diagramm und Kennzahlen; optionaler kostenloser OpenVan-Vergleich mit separater Speicherung. Dies sind nationale Durchschnittswerte, keine Preise einzelner Tankstellen. Bedienung, Quellen und Import: [LPG-Statistik](docs/lpg-statistics.md).
 
 Intelligent Fuel Price Analytics Platform – Hochschulprojekt im Modul
 Datenmanagement und Visualisierung, TH OWL, Wintersemester 2026/2027.
