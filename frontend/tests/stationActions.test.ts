@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import test from 'node:test'
+import { test } from 'vitest'
 import { readFavorites, routeUrl, toggleFavorite } from '../src/stationActions.ts'
 import { historyCsv } from '../src/historyCsv.ts'
 import { createDemoResult, demoHistoryLoader } from '../src/demoData.ts'

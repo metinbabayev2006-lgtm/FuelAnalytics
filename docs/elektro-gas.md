@@ -101,3 +101,8 @@ HTTP 503 mit Importhinweis. Anbieterfehler: 502, Zeitlimit: 504, Abfragelimit: 4
   verweigerte den Zugriff (HTTP 403). Kein erfolgreicher Gas-Live-Test bestätigt.
 - Tests auf separatem Backend-Port 8081; die IntelliJ-Instanz auf 8080 bleibt
   unter Nutzerkontrolle. Für die neue Version muss sie einmal neu gestartet werden.
+
+
+## Nationale LPG-Statistik
+
+Zusätzlich stehen kostenlose deutsche LPG-Durchschnittspreise und historische EU-Wochenwerte seit 2005 zur Verfügung. Sie sind separat von Stationspreisen und Kartenmarkern: [Bedienung und Quellen](lpg-statistics.md).

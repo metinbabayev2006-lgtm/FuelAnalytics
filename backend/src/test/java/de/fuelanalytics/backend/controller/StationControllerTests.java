@@ -95,6 +95,25 @@ class StationControllerTests {
         assertEquals(400, get(historyPath("e10", "2026-10-16T11:00:00Z", "2026-10-16T10:00:00Z")).statusCode());
     }
 
+    @Test
+    void archiveReadsOnlySavedPricesForSelectedFuelAndValidatesPaging() throws Exception {
+        prices.save(new PriceObservation(stationId, FuelType.e10, new BigDecimal("1.759"), start));
+        prices.save(new PriceObservation(stationId, FuelType.e10, new BigDecimal("1.799"), start.plusSeconds(60)));
+        var response = get("/api/stations/archive?fuelType=e10");
+        assertEquals(200, response.statusCode());
+        var data = json.readTree(response.body());
+        assertFalse(data.get("hasMore").asBoolean());
+        var row = data.get("entries").get(0);
+        assertEquals(stationId.toString(), row.get("station").get("id").asText());
+        assertEquals(2, row.get("count").asInt());
+        assertEquals(start.toString(), row.get("firstObservedAt").asText());
+        assertEquals(start.plusSeconds(60).toString(), row.get("lastObservedAt").asText());
+        assertEquals(0, json.readTree(get("/api/stations/archive?fuelType=diesel").body()).get("entries").size());
+        assertEquals(0, json.readTree(get("/api/stations/archive?fuelType=e10&offset=100").body()).get("entries").size());
+        assertEquals(400, get("/api/stations/archive?fuelType=e10&offset=-1").statusCode());
+        assertEquals(400, get("/api/stations/archive?fuelType=lpg").statusCode());
+        assertEquals(400, get("/api/locations?query=Test&mode=unknown").statusCode());
+    }
     private String historyPath(String fuel, String from, String to) {
         return "/api/stations/" + stationId + "/prices?fuelType=" + fuel + "&from=" + from + "&to=" + to;
     }

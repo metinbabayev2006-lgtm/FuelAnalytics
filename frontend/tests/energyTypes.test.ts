@@ -1,4 +1,4 @@
-import { test } from 'node:test'
+import { test } from 'vitest'
 import assert from 'node:assert/strict'
 import { validEnergyResult } from '../src/energyTypes.ts'
 const fixture = () => ({ fetchedAt: '2026-10-22T12:00:00Z', kind: 'electric', truncated: false, source: 'osm', sourceDate: null, stations: [

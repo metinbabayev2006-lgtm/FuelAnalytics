@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import test from 'node:test'
+import { test } from 'vitest'
 import { comparisonRows, historyStatistics, loadHistorySeries, toggleComparison, validateHistory } from '../src/historyComparison.ts'
 import type { Observation } from '../src/historyComparison.ts'
 

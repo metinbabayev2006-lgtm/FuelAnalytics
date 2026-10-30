@@ -17,6 +17,7 @@ type Props = { selected: Location | null; onSelect: (location: Location | null) 
 
 export function LocationPicker({ selected, onSelect, disabled, locating, onLocationBusy }: Props) {
   const [query, setQuery] = useState('Detmold')
+  const [mode, setMode] = useState('place')
   const [locations, setLocations] = useState<Location[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -36,9 +37,10 @@ export function LocationPicker({ selected, onSelect, disabled, locating, onLocat
     onSelect(null)
     const timeout = window.setTimeout(() => controller.abort(), 15_000)
     try {
-      const response = await fetch(`/api/locations?query=${encodeURIComponent(query.trim())}`, { signal: controller.signal })
+      const response = await fetch(`/api/locations?query=${encodeURIComponent(query.trim())}&mode=${mode}`, { signal: controller.signal })
       if (!response.ok) throw new Error(response.status === 429 ? 'Bitte warte kurz vor der nächsten Ortssuche.'
-        : response.status === 400 ? 'Bitte gib einen Ort mit 2 bis 100 Zeichen oder eine fünfstellige deutsche PLZ ein.'
+        : mode === 'address' && response.status !== 400 ? 'Die Adresssuche ist derzeit nicht erreichbar. Bitte später erneut versuchen oder Ort/PLZ bzw. deinen Standort nutzen.'
+        : response.status === 400 ? 'Bitte gib einen Ort oder eine Adresse mit 2 bis 100 Zeichen oder eine fünfstellige deutsche PLZ ein.'
           : /^[0-9]{5}$/.test(query.trim()) ? 'Der PLZ-Dienst ist nicht erreichbar oder liefert keine gültigen Koordinaten. Bitte suche stattdessen nach dem Ortsnamen.'
             : 'Der Dienst für Ortsnamen ist derzeit nicht erreichbar. Bitte versuche eine fünfstellige PLZ (Berlin zum Beispiel: 10115) oder nutze deinen Standort.')
       const data: unknown = await response.json()
@@ -57,8 +59,14 @@ export function LocationPicker({ selected, onSelect, disabled, locating, onLocat
   return <div className="location-picker">
     <form onSubmit={event => { event.preventDefault(); void searchLocations() }}>
       <fieldset disabled={disabled || locating}>
-        <legend>1. Ort auswählen</legend>
-        <label htmlFor="place-query">Ort oder Postleitzahl in Deutschland</label>
+        <legend>Standort</legend>
+        <div className="location-type"><label htmlFor="location-mode">Suchen nach</label>
+        <select id="location-mode" value={mode} onChange={event => {
+          active.current?.abort(); active.current = null
+          setMode(event.target.value); onSelect(null); setLocations([]); setLoading(false); setError(''); setSearched(false)
+        }}><option value="place">Ort oder PLZ</option><option value="address">Straße und Hausnummer</option></select></div>
+        <label htmlFor="place-query">{mode === 'address' ? 'Straße, Hausnummer und Ort in Deutschland' : 'Ort oder Postleitzahl in Deutschland'}</label>
+        {mode === 'address' && <p className="last-checked">Zum Beispiel: Hornsche Straße 43, Detmold. Suche über OpenStreetMap.</p>}
         <div className="location-input-row">
           <input id="place-query" value={query} minLength={2} maxLength={100} required onChange={event => {
             active.current?.abort(); active.current = null
@@ -68,17 +76,17 @@ export function LocationPicker({ selected, onSelect, disabled, locating, onLocat
         </div>
         {loading && <p role="status">Passende Orte werden gesucht …</p>}
         {error && <p role="alert" className="error">{error}</p>}
-        {searched && locations.length === 0 && <p role="status">Kein passender Ort gefunden. Versuche einen anderen Namen oder eine PLZ.</p>}
+        {searched && locations.length === 0 && <p role="status">Kein passender Treffer gefunden. Ergänze bei Straßen bitte den Ort oder die PLZ.</p>}
         {locations.length > 0 && <>
-          <p role="status">{locations.length} Treffer. Bitte wähle den passenden Ort:</p>
+          <p role="status">Passenden Treffer auswählen:</p>
           <ul className="location-results">{locations.map(location => <li key={location.id}>
             <button type="button" aria-pressed={selected?.id === location.id} onClick={() => onSelect(location)}>
               {locationLabel(location)}{selected?.id === location.id ? ' · Ausgewählt' : ''}
-              <span className="location-position">{locationPosition(location)}</span>
+              <span className="location-position sr-only">{locationPosition(location)}</span>
             </button>
           </li>)}</ul>
         </>}
-        <p className="last-checked">Ortsnamen: <a href="https://open-meteo.com/en/docs/geocoding-api">Open-Meteo</a> / <a href="https://www.geonames.org/">GeoNames</a>. PLZ: <a href="https://zippopotam.us/">Zippopotam.us</a> / GeoNames. Die Ortssuche ruft noch keine Kraftstoffpreise ab.</p>
+        <details className="source-details"><summary>Datenquellen der Suche</summary><p className="last-checked">Adressen: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap-Mitwirkende · ODbL</a>, über Nominatim. Ortsnamen: <a href="https://open-meteo.com/en/docs/geocoding-api">Open-Meteo</a> / <a href="https://www.geonames.org/">GeoNames</a>. PLZ: <a href="https://zippopotam.us/">Zippopotam.us</a> / GeoNames. Die Ortssuche ruft noch keine Kraftstoffpreise ab.</p></details>
       </fieldset>
     </form>
     <LocationButton disabled={disabled || loading} onBusyChange={onLocationBusy} onStart={() => onSelect(null)} onSelect={location => {

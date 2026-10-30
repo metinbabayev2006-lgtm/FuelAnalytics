@@ -1,6 +1,9 @@
 package de.fuelanalytics.backend.repository;
 
 import de.fuelanalytics.backend.model.Station;
+import de.fuelanalytics.backend.model.FuelType;
+import de.fuelanalytics.backend.model.StoredHistory;
+import java.util.List;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -44,6 +47,20 @@ public class StationRepository {
                 """, station.name(), station.brand(), station.street(), station.houseNumber(),
                 station.postalCode(), station.place(), station.latitude(), station.longitude(),
                 Timestamp.from(station.updatedAt()), station.id()) == 1;
+    }
+
+    /** Includes only stations with stored prices for the requested fuel; never calls a provider. */
+    public List<StoredHistory> archive(FuelType fuel, int offset) {
+        return jdbc.query("""
+                SELECT s.*, h.sample_count, h.first_observed, h.last_observed
+                FROM station s JOIN (
+                    SELECT station_id, COUNT(*) AS sample_count, MIN(observed_at) AS first_observed,
+                           MAX(observed_at) AS last_observed
+                    FROM price_observation WHERE fuel_type = ? GROUP BY station_id
+                ) h ON s.id = h.station_id
+                ORDER BY s.name, s.id LIMIT 101 OFFSET ?
+                """, (row, number) -> new StoredHistory(mapStation(row), row.getLong("sample_count"),
+                row.getTimestamp("first_observed").toInstant(), row.getTimestamp("last_observed").toInstant()), fuel.name(), offset);
     }
 
     private static Station mapStation(ResultSet row) throws SQLException {

@@ -47,11 +47,11 @@ function validResult(value: unknown): value is Result {
 export function LiveSearch() {
   const [demo, setDemo] = useState(false)
   return <>
-    <div className={`demo-mode-panel${demo ? ' active' : ''}`}>
-      <div><strong>{demo ? 'VORFÜHRMODUS · ALLE PREISE UND TANKSTELLEN SIND FIKTIV' : 'Das Projekt kennenlernen'}</strong>
-        <p>{demo ? 'Beispieldaten für Liste, Karte, Tankkosten, Preisverlauf und CSV. Keine echten Routen oder Anbieterabrufe. Die Karte zeigt ein schematisches Koordinatengitter.' : 'Ohne Preis-API ausprobieren: Der Vorführmodus zeigt ausdrücklich fiktive Beispieldaten.'}</p></div>
+    <details className={`demo-mode-panel${demo ? ' active' : ''}`}><summary>{demo ? 'Beispielmodus aktiv · fiktive Preise' : 'Mit Beispieldaten ausprobieren'}</summary><div className="demo-content">
+      <div>
+        <p>{demo ? 'Alle Tankstellen und Preise sind fiktiv. Es werden keine Live-Preise abgerufen.' : 'Teste Liste, Karte und Preisverlauf mit fiktiven Tankstellen – ohne Preisabfrage.'}</p></div>
       <button type="button" aria-pressed={demo} onClick={() => setDemo(value => !value)}>{demo ? 'Zur echten Suche wechseln' : 'Vorführmodus starten'}</button>
-    </div>
+    </div></details>
     <SearchWorkspace key={demo ? 'demo' : 'live'} demo={demo} />
   </>
 }
@@ -123,9 +123,15 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
         body: JSON.stringify({ latitude: location.latitude, longitude: location.longitude, radiusKm: requestedRadius }),
       })
       if (!response.ok) {
+        // Validation/configuration failures occur before a provider request.
+        // Keep the cooldown for 429 and ambiguous network/provider failures.
+        if (response.status === 400 || response.status === 503) {
+          nextRequest.current = 0
+          setRemaining(0)
+        }
         const messages: Record<number, string> = {
           429: 'Das Abfragelimit ist erreicht. Bitte warte mindestens 61 Sekunden und versuche es erneut.',
-          503: 'Der Tankerkönig-Schlüssel ist im Backend nicht korrekt eingerichtet.',
+          503: 'Der Tankerkönig-Schlüssel ist im Backend nicht korrekt eingerichtet. Prüfe die lokale .env und starte das Backend danach neu.',
           502: 'Tankerkönig ist derzeit nicht erreichbar oder liefert ungültige Daten.',
           504: 'Tankerkönig hat nicht rechtzeitig geantwortet. Bitte warte den Countdown ab und versuche es erneut. Der Vorführmodus funktioniert unabhängig davon.',
         }
@@ -160,11 +166,11 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
 
   return <section className="live-card" aria-labelledby="live-title">
     <div className="search-panel" id="search-panel">
-    <div className="section-heading"><div><p className="section-kicker">01 / DEINE SUCHE</p><h2 id="live-title">Wo möchtest du tanken?</h2></div><span className="live-badge"><span />{demo ? 'Synthetische Beispieldaten' : energy === 'electric' ? 'Ladesäulenregister · Bundesnetzagentur' : energy ? 'Standorte aus OpenStreetMap' : 'Daten von Tankerkönig'}</span></div>
+    <div className="section-heading"><div><h2 id="live-title">Tankstelle finden</h2></div><span className="live-badge"><span />{demo ? 'Synthetische Beispieldaten' : energy === 'electric' ? 'Ladesäulenregister · Bundesnetzagentur' : energy ? 'Standorte aus OpenStreetMap' : 'Daten von Tankerkönig'}</span></div>
     <div className="search-workspace">
     <LocationPicker selected={location} onSelect={setLocation} disabled={loading || demo} locating={locating} onLocationBusy={setLocating} />
-    <div className="search-options"><h3><span className="step-number">2</span> Suche eingrenzen</h3>
-    <p className="selection-note">{demo ? 'Vorführgebiet: Detmold · 5 km. Die echte Suche ist im Vorführmodus gesperrt.' : location ? `Ausgewählt: ${locationLabel(location)}` : 'Wähle zuerst einen passenden Ortstreffer.'}</p>
+    <div className="search-options"><h3>Kraftstoff &amp; Umkreis</h3>
+    <p className="selection-note">{demo ? 'Vorführgebiet: Detmold · 5 km. Die echte Suche ist im Vorführmodus gesperrt.' : location ? `Ausgewählt: ${locationLabel(location)}` : 'Wähle zuerst einen Standort aus.'}</p>
     <div className="search-controls">
       <label>Suchradius<select disabled={loading || demo} value={radiusKm} onChange={event => setRadiusKm(Number(event.target.value))}>
         {[1, 2, 5, 10, 15, 25].map(radius => <option key={radius} value={radius}>{radius} km</option>)}
@@ -175,17 +181,17 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
         if (value === 'electric' || value === 'gas') { setEnergy(value); setSort('distance') }
         else { setEnergy(null); setFuel(value as Fuel); setSort('price') }
       }}>
-        <option value="e10">Benzin · Super E10</option><option value="e5">Benzin · Super E5</option><option value="diesel">Diesel</option>
+        <option value="e10">Super E10</option><option value="e5">Super E5</option><option value="diesel">Diesel</option>
         <option value="electric" disabled={demo}>Elektro · Ladestationen</option><option value="gas" disabled={demo}>Gas · LPG / CNG</option>
       </select></label>
       <label>Sortieren nach<select value={sort} onChange={event => setSort(event.target.value)}>
-        {!energy && <option value="price">Preis, günstigster zuerst</option>}<option value="distance">Entfernung, nächste zuerst</option>{energy && <option value="name">Name, A–Z</option>}
+        {!energy && <option value="price">Günstigster Preis</option>}<option value="distance">Nächste zuerst</option>{energy && <option value="name">Name, A–Z</option>}
       </select></label>
     </div>
     <button className="search-submit" disabled={demo || !location || loading || locating || (!energy && remaining > 0)} onClick={() => void (energy ? searchEnergy() : search())}>
       {loading ? 'Wird abgerufen …' : energy ? 'Standorte suchen' : remaining > 0 ? `Erneut möglich in ${remaining} s` : 'Preise abrufen'}
       <Icon name="arrow" /></button>
-    <p className="last-checked">{energy ? 'Echte Standorte mit Entfernung und Route. Keine Live-Preise oder Belegung. Gas wird getrennt als LPG bzw. CNG gekennzeichnet.' : 'Abruf auf Klick. Danach frei vergleichen und sortieren.'}</p>
+    <p className="last-checked">{energy ? 'Standorte und Routen, keine Stationspreise.' : 'Aktualisieren ist einmal pro Minute möglich.'}</p>
     </div></div>
     {loading && <p role="status">{energy ? 'Standorte werden gesucht …' : 'Tankstellen werden abgerufen und in der Datenbank gespeichert …'}</p>}
     {error && <p role="alert" className="error">{error}</p>}
@@ -206,19 +212,19 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
       stale={loading || !!error || radiusKm !== energyResult.radiusKm || location?.latitude !== energyResult.center.latitude || location?.longitude !== energyResult.center.longitude} />
       : <div className="empty-state"><div><p className="section-kicker">{energy === 'electric' ? 'ELEKTRO' : 'GAS · LPG / CNG'}</p><h3>{energy === 'electric' ? 'Finde Ladestationen in deiner Nähe.' : 'Finde passende Gastankstellen.'}</h3><p>Wähle einen Ort und klicke auf „Standorte suchen“. Die Ergebnisse erscheinen in Liste und Karte. Preise werden für diese Energiearten nicht geliefert.</p></div></div>)}
     {!energy && <>
-    {!result && <div className="empty-state"><div className="empty-orbit" aria-hidden="true"><span /><span /><Icon name="fuel" /></div><div><p className="section-kicker">DEIN NÄCHSTER TANKSTOPP</p><h3>Ein guter Preis beginnt<br />mit einem guten Überblick.</h3><p>Wähle oben einen Ort und rufe die Preise ab.<br />Hier erscheinen dein Preisvergleich und die Tankstellenkarte.</p></div><span className="empty-caption">SUCHEN → VERGLEICHEN → ENTSCHEIDEN</span></div>}
+    {!result && <div className="empty-state"><Icon name="search" /><div><h3>Noch keine Ergebnisse</h3><p>Suche einen Ort, wähle einen Treffer und klicke auf „Preise abrufen“.</p></div></div>}
     {result && <>
-      <div className="section-heading result-heading"><div><p className="section-kicker">02 / DEIN PREISÜBERBLICK</p><h3>{result.searchLabel} <span className="radius-badge">{result.radiusKm} km Umkreis</span></h3></div><p className="result-count"><strong>{result.stations.length}</strong> Tankstellen gefunden</p></div>
+      <div className="section-heading result-heading"><div><h3>{result.searchLabel} <span className="radius-badge">{result.radiusKm} km Umkreis</span></h3></div><p className="result-count"><strong>{result.stations.length}</strong> Tankstellen gefunden</p></div>
       <p role="status" className="data-timestamp">Datenstand: <time dateTime={result.observedAt}>{dateFormat.format(new Date(result.observedAt))}</time> (Berlin)</p>
       {(loading || error) && <p className="loading">Die angezeigten Ergebnisse stammen weiterhin vom oben genannten Datenstand.</p>}
       {result.rejectedStations > 0 && <p className="loading">{result.rejectedStations} ungültige Datensätze wurden verworfen.</p>}
       <PriceSummary entries={result.stations} fuel={fuel} />
-      <TankCalculator value={tankAmount} onChange={setTankAmount} minimumPrice={comparison?.min ?? null} maximumPrice={comparison?.max ?? null} />
+      <details className="optional-panel"><summary>Tankkosten berechnen</summary><TankCalculator value={tankAmount} onChange={setTankAmount} minimumPrice={comparison?.min ?? null} maximumPrice={comparison?.max ?? null} /></details>
       <label className="favorite-filter"><input type="checkbox" checked={favoritesOnly} onChange={event => setFavoritesOnly(event.target.checked)} />Nur Favoriten in Liste und Karte anzeigen</label>
       {favorites.message && <p role="status">{favorites.message}</p>}
-      <p className="last-checked">Preisübersicht und Tankkosten beziehen sich weiterhin auf alle gefundenen Tankstellen. {demo ? 'Keine echten Routen für fiktive Tankstellen.' : '„Route zur Tankstelle“ öffnet Google Maps in einem neuen Tab und übermittelt die Zielkoordinaten. Startpunkt dort wählen; unsere Entfernungen sind Luftlinien.'}</p>
+      <p className="last-checked">Entfernungen sind Luftlinien. {demo ? 'Beispieldaten: keine echten Routen.' : 'Routen öffnen in Google Maps.'}</p>
       <div className="results-grid">
-      <StationsMap entries={entries} fuel={fuel} center={result.center} radiusKm={result.radiusKm} observedAt={result.observedAt} demo={demo} />
+
       <section className="station-panel" aria-labelledby="stations-title"><div className="panel-heading"><div><p className="section-kicker">PREISE IM VERGLEICH</p><h4 id="stations-title">Deine Tankstellen</h4></div><span className="count-badge">{entries.length}</span></div>
       {entries.length === 0 ? <p>{favoritesOnly ? 'Keine gespeicherten Favoriten in diesem Suchergebnis. Deaktiviere den Filter, um alle Tankstellen zu sehen.' : 'Im gewählten Umkreis wurden keine Tankstellen gefunden.'}</p> : <div className="table-scroll station-list-scroll">
         <table className="station-table">
@@ -233,7 +239,7 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
             <td className="station-price">{entry.prices[fuel] !== undefined ? priceFormat.format(entry.prices[fuel]!) : 'Nicht verfügbar'}<StationFillCost price={entry.open ? entry.prices[fuel] : undefined} volume={tankVolume} cheapestCents={cheapestFill} /></td>
           </tr>)}</tbody>
         </table>
-      </div>}</section></div>
+      </div>}</section><StationsMap entries={entries} fuel={fuel} center={result.center} radiusKm={result.radiusKm} observedAt={result.observedAt} demo={demo} /></div>
     </>}
     </>}
     </div>
@@ -243,7 +249,7 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
           <PriceHistory key={entry.station.id} station={entry.station} availableStations={historyStations} fuel={fuel} observedAt={result.observedAt} loadSeries={loadDemoSeries} demo={demo} />)}
         </>}
       </Suspense></div>
-      {!historyStationId && <div className="history-placeholder"><Icon name="chart" /><div><h3>Jeder Abruf erzählt ein Stück mehr.</h3><p>Wähle nach deiner Suche bei einer Tankstelle „Preisverlauf ansehen“, um gespeicherte Beobachtungen zu vergleichen.</p></div></div>}
+
     </>}
     {!energy && <p className="source-footer">{demo ? 'Synthetische Vorführdaten · keine echten Preise oder Tankstellen.' : <>Quelle: <a href="https://creativecommons.tankerkoenig.de/">Tankerkönig / MTS-K</a> · <a href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a>. Preise können sich seit dem Abruf geändert haben.</>}</p>}
   </section>

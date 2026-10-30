@@ -76,3 +76,8 @@ von HTTP 502 (andere Verbindungs-/Antwortfehler). Diagnoseprotokolle enthalten
 nur feste Fehlerkategorien, HTTP-Statuscodes oder Exception-Klassennamen,
 keine API-Schlüssel, Anfrage-URLs, Rohantworten oder Exception-Nachrichten.
 Es gibt weiterhin keine automatischen Wiederholungen; 61 Sekunden Abstand bleiben bestehen.
+
+
+## Nationale LPG-Daten
+
+GET /api/lpg/national liefert den lokalen EU-Wochenverlauf für Deutschland. POST /api/lpg/openvan fragt auf ausdrücklichen Klick den kostenlosen Deutschland-Vergleich ab (6 Stunden Cache). GET /api/lpg/openvan/saved liest bisher gespeicherte OpenVan-Quellstände. Keine dieser Reihen bezeichnet einzelne Stationspreise. Siehe lpg-statistics.md.

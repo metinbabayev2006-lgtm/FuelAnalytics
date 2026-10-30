@@ -3,6 +3,7 @@ package de.fuelanalytics.backend.controller;
 import de.fuelanalytics.backend.model.FuelType;
 import de.fuelanalytics.backend.model.PriceObservation;
 import de.fuelanalytics.backend.model.Station;
+import de.fuelanalytics.backend.model.StoredHistory;
 import de.fuelanalytics.backend.repository.PriceObservationRepository;
 import de.fuelanalytics.backend.repository.StationRepository;
 import java.time.Instant;
@@ -26,6 +27,14 @@ public class StationController {
         this.stations = stations;
         this.prices = prices;
     }
+
+    @GetMapping("/archive")
+    public ArchiveResponse archive(@RequestParam FuelType fuelType, @RequestParam(defaultValue = "0") int offset) {
+        if (offset < 0 || offset > 1000000) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ungültige Seite");
+        var entries = stations.archive(fuelType, offset);
+        return new ArchiveResponse(entries.stream().limit(100).toList(), entries.size() > 100);
+    }
+    public record ArchiveResponse(List<StoredHistory> entries, boolean hasMore) { }
 
     @GetMapping("/{id}")
     public Station findStation(@PathVariable UUID id) {

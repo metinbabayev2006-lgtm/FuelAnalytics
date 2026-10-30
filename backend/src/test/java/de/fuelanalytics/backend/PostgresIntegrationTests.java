@@ -42,7 +42,7 @@ class PostgresIntegrationTests {
 
     @Test void migratesRealPostgresAndReadsExactDecimalsAndUtcBoundaries() {
         assertEquals("PostgreSQL", jdbc.execute((java.sql.Connection connection) -> connection.getMetaData().getDatabaseProductName()));
-        assertEquals(2L, jdbc.queryForObject("SELECT count(*) FROM flyway_schema_history WHERE success", Long.class));
+        assertEquals(3L, jdbc.queryForObject("SELECT count(*) FROM flyway_schema_history WHERE success", Long.class));
         transaction.executeWithoutResult(status -> {
             status.setRollbackOnly();
             UUID id = UUID.randomUUID(); stations.save(station(id, "SYNTHETISCH"));

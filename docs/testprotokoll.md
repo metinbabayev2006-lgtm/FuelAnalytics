@@ -1,5 +1,8 @@
 # Testprotokoll und Abgabestand
 
+Aktueller Nachtrag: [Funktionsprüfung vom 22.10.2026](qa-2026-10-22.md),
+einschließlich echter PostgreSQL-Tests, 23 Vitest-Tests und behobener UI-Fehler.
+
 Stand: 17.10.2026. Geprüft auf Windows mit Java 21.0.12.1, Node.js 24.20.0,
 PostgreSQL 18.6 im Docker-Container und den im Repository gesperrten
 Frontend-Abhängigkeiten. Dieses Protokoll beschreibt ausgeführte Prüfungen,
@@ -215,3 +218,8 @@ der Bericht unterscheidet Live-Prüfungen und synthetische Prüfungen ausdrückl
   startet mit der neuen Struktur. Änderungen im Java-Code beschränken sich
   auf Pakete und Imports. Keine erneute Prüfung externer Anbieter oder des
   unveränderten Frontends im Rahmen dieser Umordnung.
+
+
+## LPG-Erweiterung 30.10.2026
+
+53 Frontend-Tests bestanden; Backend verify: 76 Tests, keine Fehler, vier explizite PostgreSQL-Opt-in-Tests übersprungen. Die 72 aktiven Backend-Tests zusätzlich gegen einen neuen, isolierten PostgreSQL-18.6-Container bestanden, einschließlich V3 und atomarer Snapshot-Deduplizierung. Produktionsdatenbank nicht für synthetische Tests verwendet. Alle 1.090 importierten EU-Werte unabhängig mit openpyxl gegen die Originaldatei abgeglichen. Frontend build/lint erfolgreich. Live geprüft: EU-Diagramm 1 Jahr/gesamter Verlauf; tatsächlicher OpenVan-Abruf und Speicherung. Die Original-EU-Preise in EUR/1.000 Liter werden durch 1.000 geteilt. EU und OpenVan bleiben getrennt. Quellenstand und Details: lpg-statistics.md.

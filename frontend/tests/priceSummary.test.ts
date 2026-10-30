@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import test from 'node:test'
+import { test } from 'vitest'
 import { summarizePrices } from '../src/priceStatistics.ts'
 
 const entry = (id: string, price?: number, open = true) => ({

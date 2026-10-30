@@ -1,5 +1,9 @@
 # FuelAnalytics
 
+## LPG-Statistik Deutschland (30.10.2026)
+
+Links **LPG Deutschland** öffnen und **LPG-Statistik laden** anklicken. Offizielle EU-Wochenwerte seit 2005, Diagramm und Kennzahlen; optionaler kostenloser OpenVan-Vergleich mit separater Speicherung. Dies sind nationale Durchschnittswerte, keine Preise einzelner Tankstellen. Bedienung, Quellen und Import: [LPG-Statistik](docs/lpg-statistics.md).
+
 Intelligent Fuel Price Analytics Platform – Hochschulprojekt im Modul
 Datenmanagement und Visualisierung, TH OWL, Wintersemester 2026/2027.
 
@@ -19,6 +23,12 @@ Das Backend ist in `controller`, `service`, `repository`, `model` und `client`
 gegliedert. Die Zuständigkeiten beschreibt die [Architekturdokumentation](docs/architektur.md#paketstruktur-im-backend).
 
 ## Aktueller Stand
+
+Die lokale Funktionsprüfung vom 22.10.2026 und ihre Grenzen sind in
+[docs/qa-2026-10-22.md](docs/qa-2026-10-22.md) dokumentiert. Die Frontendtests
+laufen jetzt mit Vitest; der Quellcode enthält zusätzliche Komponenten- und
+Fehlertests. Für GitHub ist ein Workflow mit H2, PostgreSQL und Frontendtests
+vorbereitet.
 
 Implementiert sind Ortssuche, auswählbarer Radius, Abruf und Speicherung von
 Tankerkönig-Preisen, Kraftstoffauswahl, Sortierung, Tankstellenkarte,

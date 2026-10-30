@@ -23,9 +23,10 @@ export function EnergyResults({ result, center, radiusKm, searchLabel, sort, sta
     <p className="energy-notice">Standorte: {sourceName} · keine aktuellen Preise, Öffnungs- oder Belegungsdaten.
       {result.kind === 'electric' ? ' Ladepreis und Zugang hängen vom Betreiber und Ladetarif ab. Freie Anschlüsse bitte beim Betreiber prüfen.' : ' LPG (Autogas) und CNG (Erdgas) sind unterschiedliche Kraftstoffe. Bitte die passende Kennzeichnung beachten.'}
       {' '}Entfernungen sind Luftlinien. Standortdaten können unvollständig oder veraltet sein.</p>
+    {result.kind === 'gas' && <p><a href="#lpg-statistics">LPG-Durchschnittspreise und historischen Deutschland-Verlauf ansehen →</a></p>}
     {result.truncated && <p role="status">{register ? 'Angezeigt werden die nächsten 500 Ladeeinrichtungen aus dem Register. Für weniger Treffer bitte den Suchradius verkleinern.' : 'Die Antwort wurde auf höchstens 500 Standorte begrenzt. Bitte verkleinere den Suchradius; es ist keine vollständige Liste der nächsten Standorte.'}</p>}
     <div className="results-grid">
-      <StationsMap entries={entries} fuel={result.kind} center={center} radiusKm={radiusKm} observedAt={result.fetchedAt} />
+
       <section className="station-panel" aria-label="Standortliste"><div className="panel-heading"><h4>{result.kind === 'electric' ? 'Deine Ladestationen' : 'Deine Gastankstellen'}</h4><span className="count-badge">{sites.length}</span></div>
         {sites.length === 0 ? <p>Keine passenden Standorte im Datenbestand gefunden. Versuche einen größeren Radius. Ein leeres Ergebnis bedeutet nicht, dass es vor Ort keine gibt.</p> :
           <ul className="energy-site-list">{sites.map(site => <li key={site.id}>
@@ -38,6 +39,7 @@ export function EnergyResults({ result, center, radiusKm, searchLabel, sort, sta
             <div className="station-actions"><RouteLink station={site} label="Route zum Standort" />{!register && <a className="route-link" href={`https://www.openstreetmap.org/${site.id.split(':')[1]}/${site.id.split(':')[2]}`} target="_blank" rel="noopener noreferrer">OSM-Eintrag ↗</a>}</div>
           </li>)}</ul>}
       </section>
+<StationsMap entries={entries} fuel={result.kind} center={center} radiusKm={radiusKm} observedAt={result.fetchedAt} />
     </div>
     <p className="source-footer">{register ? <>Standortquelle: <a href="https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenkarte/start.html">Bundesnetzagentur.de</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Registerstand: {result.sourceDate}. Lokale Suche im importierten Datenbestand.</>
       : <>Standortquelle: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap-Mitwirkende · ODbL</a>, abgerufen über Overpass. Zwischenspeicherung bis zu 30 Minuten.</>}</p>
