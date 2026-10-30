@@ -1,0 +1,31 @@
+{
+  "format": 1,
+  "cities": [
+    "Berlin",
+    "München",
+    "Frankfurt am Main",
+    "Köln",
+    "Detmold"
+  ],
+  "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  "archive": {
+    "file": "archive.jsonl.gz",
+    "sha256": "08349bf4bfe6d93362e6782578c7609ff73866ce8f3ffbd16c83437f30b125e8",
+    "rows": {
+      "archive_station": 673,
+      "archive_import": 1,
+      "archive_daily_price": 734607
+    },
+    "bytes": 10689846
+  },
+  "monthly": {
+    "file": "kaggle-2022.jsonl.gz",
+    "sha256": "1780a064c9ee25fdcaeaa1b9b246190305461e536cf0d666f860da5e5dc00829",
+    "rows": {
+      "historical_station": 617,
+      "historical_monthly_import": 1,
+      "historical_monthly_price": 21461
+    },
+    "bytes": 141033
+  }
+}

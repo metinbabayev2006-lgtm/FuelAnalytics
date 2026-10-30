@@ -1,5 +1,19 @@
 # Projektstand
 
+## Mitgelieferte Präsentationsdaten (30.10.2026, lokal vorbereitet)
+
+- Rund 10,8 MB versionierbare, komprimierte historische Daten für fünf Städte:
+  673 Archivstationen/734.607 Tagesintegrale und 617 Kaggle-Stationen/21.461 Monatsmittel.
+- Automatischer Erstimport nach Flyway V6, SHA-256- und Zeilenzahlprüfung,
+  transaktional und gegen parallele Erststarts gesperrt. Eigene Messungen bleiben
+  unberührt; vorhandene Archive werden übersprungen.
+- Vollständiger Erstimport und zweiter Start mit H2 und echtem PostgreSQL in
+  getrennten Testdatenbanken/-schema geprüft. 84 Backendtests bestanden,
+  4 bestehende optionale Tests übersprungen; Maven verify/JAR erfolgreich.
+- Datenpaket im ausführbaren JAR geprüft; keine Zugangsdaten in den Paketdaten.
+- Upload des neuen Datenpakets wartet auf ausdrückliche Freigabe.
+  [Anleitung für Laptop und Gruppenrechner](bundled-history.md).
+
 ## Tankerkönig-Jahresarchiv importiert (30.10.2026, lokal)
 
 - Vollständig verarbeiteter Zeitraum: 01.10.2025 bis 01.10.2026 (exklusiv),

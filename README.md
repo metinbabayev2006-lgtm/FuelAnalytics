@@ -1,5 +1,14 @@
 # FuelAnalytics
 
+## Historische Daten beim ersten Start automatisch verfügbar
+
+Ein komprimiertes Präsentationspaket (rund 10,8 MB) liefert historische Preise
+für Berlin, München, Frankfurt am Main, Köln und Detmold mit. Nach dem Klonen
+PostgreSQL starten und das Backend starten: Fehlende Archive werden automatisch
+importiert. Bereits vorhandene Archive und eigene Preisbeobachtungen bleiben
+erhalten. Ein persönlicher Tankerkönig-Archivzugang ist dafür nicht nötig.
+Anleitung für Laptop und Mitschüler: [Datenpaket und Erststart](docs/bundled-history.md).
+
 ## Tankerkönig: zwölf historische Monate für fünf Städte
 
 Die neue Archivansicht liegt unter **Preisverlauf → Historische Monatswerte →
@@ -9,7 +18,8 @@ sind fest auswählbar. Zeitgewichtete Monatsmittel, Vergleich von bis zu drei
 Tankstellen sowie eine Tabelle mit bekannter Preisgültigkeitsdauer; Lücken
 werden nicht aufgefüllt. Ältere Kaggle-Jahre bleiben getrennt auswählbar.
 
-Der persönliche Archivzugang und die importierten Daten bleiben lokal. Anleitung,
+Der persönliche Archivzugang und die Rohdownloads bleiben lokal. Das mitgelieferte
+Präsentationspaket enthält ausschließlich historische Daten der fünf Städte. Anleitung,
 fortsetzbarer Import, Berechnung und Einschränkungen:
 [Tankerkönig-Archiv](docs/tankerkoenig-archive.md).
 
