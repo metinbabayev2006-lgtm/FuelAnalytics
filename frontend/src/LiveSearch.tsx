@@ -12,6 +12,7 @@ import { LocationPicker } from './LocationPicker'
 import { locationLabel } from './location'
 import type { Location } from './location'
 import { RouteLink } from './RouteLink'
+import { StationDetails } from './StationDetails'
 import { useFavorites } from './useFavorites'
 import { createDemoResult, demoHistoryLoader } from './demoData'
 import type { Result, SearchResult } from './searchTypes'
@@ -233,6 +234,7 @@ function SearchWorkspace({ demo }: { demo: boolean }) {
           <tbody>{entries.map(entry => <tr key={entry.station.id}>
             <td><strong>{entry.station.name}</strong><span className="station-address">{[entry.station.street, entry.station.houseNumber, entry.station.place].filter(Boolean).join(' ')}</span>
               <span className={`station-open ${entry.open ? 'connected' : 'demo-note'}`}>{entry.open ? 'Geöffnet beim Abruf' : 'Geschlossen beim Abruf'}</span>
+              {!demo && <StationDetails key={result.observedAt} station={entry.station} />}
               <button className="history-button" aria-pressed={historyStationId === entry.station.id} onClick={() => setHistoryStationId(entry.station.id)}><Icon name="chart" />Preisverlauf ansehen<span className="sr-only">: {entry.station.name}</span><Icon name="arrow" /></button>
               <div className="station-actions"><RouteLink station={entry.station} demo={demo} /><button type="button" className="favorite-button" aria-pressed={favorites.favorites.some(item => item.id === entry.station.id)} onClick={() => favorites.toggle(entry.station)} aria-label={`Favorit: ${entry.station.name}`}>{favorites.favorites.some(item => item.id === entry.station.id) ? '★ Gemerkt' : '☆ Merken'}</button></div></td>
             <td className="station-distance">{distanceFormat.format(entry.distanceKm)} km</td>

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -33,6 +34,7 @@ class PostgresIntegrationTests {
     @Autowired PriceObservationRepository prices;
     @Autowired SearchResultStore store;
     @Autowired TransactionTemplate transaction;
+    @Autowired Flyway flyway;
     private static final Instant TIME = Instant.parse("2026-10-17T12:00:00.123456Z");
 
     private Station station(UUID id, String name) {
@@ -42,7 +44,8 @@ class PostgresIntegrationTests {
 
     @Test void migratesRealPostgresAndReadsExactDecimalsAndUtcBoundaries() {
         assertEquals("PostgreSQL", jdbc.execute((java.sql.Connection connection) -> connection.getMetaData().getDatabaseProductName()));
-        assertEquals(3L, jdbc.queryForObject("SELECT count(*) FROM flyway_schema_history WHERE success", Long.class));
+        assertTrue(flyway.validateWithResult().validationSuccessful);
+        assertEquals(0, flyway.info().pending().length);
         transaction.executeWithoutResult(status -> {
             status.setRollbackOnly();
             UUID id = UUID.randomUUID(); stations.save(station(id, "SYNTHETISCH"));

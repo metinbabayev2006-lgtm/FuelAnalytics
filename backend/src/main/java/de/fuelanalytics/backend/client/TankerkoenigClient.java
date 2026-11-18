@@ -7,10 +7,15 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.LongSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import org.slf4j.Logger;
@@ -29,6 +34,7 @@ public class TankerkoenigClient {
     private final ObjectMapper json = new ObjectMapper();
     private Long lastRequest;
     private static final long MIN_INTERVAL = Duration.ofSeconds(61).toNanos();
+    private final LinkedHashMap<UUID, CachedHours> hoursCache = new LinkedHashMap<>();
 
     @Autowired
     public TankerkoenigClient(@Value("${TANKERKOENIG_API_KEY:}") String apiKey) {
@@ -50,20 +56,56 @@ public class TankerkoenigClient {
                 !Double.isFinite(radiusKm) || radiusKm <= 0 || radiusKm > 25) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ungültige Koordinaten oder Radius (maximal 25 km)");
         }
+        var observedAt = Instant.now();
+        var rows = request(endpoint, "lat=" + latitude + "&lng=" + longitude +
+                "&rad=" + radiusKm + "&type=all&sort=dist", "stations");
+        if (!rows.isArray()) throw providerError();
+        return new SearchResponse(observedAt, rows);
+    }
+
+    public synchronized OpeningHours openingHours(UUID id) {
+        var cached = hoursCache.get(id);
+        long now = nanoTime.getAsLong();
+        if (cached != null && now - cached.loadedAt() < Duration.ofMinutes(10).toNanos()) return cached.hours();
+        var station = request(endpoint.resolve("detail.php"), "id=" + id, "station");
+        if (!station.isObject() || !id.toString().equalsIgnoreCase(station.path("id").asText())) throw providerError();
+        var periods = new ArrayList<OpeningPeriod>();
+        for (var row : station.path("openingTimes")) {
+            String start = row.path("start").asText(), end = row.path("end").asText(), label = row.path("text").asText();
+            if (!label.isBlank() && validTime(start) && validTime(end)) periods.add(new OpeningPeriod(label, start.substring(0, 5), end.substring(0, 5)));
+        }
+        var exceptions = new ArrayList<String>();
+        for (var row : station.path("overrides")) if (row.isTextual() && !row.asText().isBlank()) exceptions.add(row.asText());
+        var hours = new OpeningHours(station.path("wholeDay").asBoolean(false), List.copyOf(periods), List.copyOf(exceptions));
+        hoursCache.put(id, new CachedHours(now, hours));
+        if (hoursCache.size() > 200) hoursCache.pollFirstEntry();
+        return hours;
+    }
+
+    private static boolean validTime(String value) {
+        return value.matches("(?:(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?|24:00(?::00)?)");
+    }
+
+    private JsonNode request(URI target, String query, String field) {
         if (!apiKey.matches("[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}")) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Tankerkönig-Schlüssel fehlt oder hat ein ungültiges Format");
         }
         long now = nanoTime.getAsLong();
         if (lastRequest != null && now - lastRequest < MIN_INTERVAL) {
+            long seconds = Math.max(1, (MIN_INTERVAL - (now - lastRequest) + 999_999_999) / 1_000_000_000);
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
-                    "Tankerkönig wurde kürzlich abgefragt. Bitte mindestens 61 Sekunden zwischen Abfragen warten.");
+                    "Tankerkönig wurde kürzlich abgefragt.") {
+                @Override public HttpHeaders getHeaders() {
+                    var headers = new HttpHeaders();
+                    headers.set(HttpHeaders.RETRY_AFTER, Long.toString(seconds));
+                    return headers;
+                }
+            };
         }
-        URI uri = URI.create(endpoint + "?lat=" + latitude + "&lng=" + longitude +
-                "&rad=" + radiusKm + "&type=all&sort=dist&apikey=" + apiKey);
+        URI uri = URI.create(target + "?" + query + "&apikey=" + apiKey);
         HttpRequest request = HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(12))
                 .header("Accept", "application/json").GET().build();
         lastRequest = now;
-        Instant observedAt = Instant.now();
         try {
             var response = http.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
@@ -72,11 +114,11 @@ public class TankerkoenigClient {
             }
             JsonNode root = json.readTree(response.body());
             if (root == null || !root.isObject() || !root.path("ok").isBoolean() ||
-                    !root.path("ok").asBoolean() || !root.path("stations").isArray()) {
+                    !root.path("ok").asBoolean() || !root.hasNonNull(field)) {
                 LOG.warn("Tankerkönig request failed: rejected_or_invalid_response");
                 throw providerError();
             }
-            return new SearchResponse(observedAt, root.get("stations"));
+            return root.get(field);
         } catch (HttpTimeoutException error) {
             LOG.warn("Tankerkönig request failed: timeout");
             throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT,
@@ -100,4 +142,7 @@ public class TankerkoenigClient {
     }
 
     public record SearchResponse(Instant observedAt, JsonNode stations) { }
+    public record OpeningPeriod(String label, String start, String end) { }
+    public record OpeningHours(boolean wholeDay, List<OpeningPeriod> periods, List<String> exceptions) { }
+    private record CachedHours(long loadedAt, OpeningHours hours) { }
 }

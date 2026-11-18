@@ -33,7 +33,7 @@ class TankerkoenigClientTests {
     @BeforeEach
     void startFakeProvider() throws Exception {
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-        server.createContext("/list.php", exchange -> {
+        server.createContext("/", exchange -> {
             requests.incrementAndGet();
             byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().add("Content-Type", "application/json");
@@ -69,6 +69,28 @@ class TankerkoenigClientTests {
         assertEquals(1, requests.get());
         clock.addAndGet(Duration.ofSeconds(61).toNanos());
         client.search(52, 8.9, 5);
+        assertEquals(2, requests.get());
+    }
+
+    @Test
+    void openingHoursShareTheSearchLimitAndUseCachedDetails() {
+        var client = client(token);
+        var id = java.util.UUID.fromString(token);
+        client.search(52, 8.9, 5);
+        clock.addAndGet(Duration.ofSeconds(50).toNanos());
+        var limited = assertThrows(ResponseStatusException.class, () -> client.openingHours(id));
+        assertEquals(429, limited.getStatusCode().value());
+        assertEquals("11", limited.getHeaders().getFirst("Retry-After"));
+        clock.addAndGet(Duration.ofSeconds(11).toNanos());
+        response = """
+                {"ok":true,"station":{"id":"%s","wholeDay":false,
+                 "openingTimes":[{"text":"Mo-Fr","start":"06:00:00","end":"22:00:00"}],
+                 "overrides":["Sonntag geschlossen"]}}
+                """.formatted(id);
+        var hours = client.openingHours(id);
+        assertEquals(new TankerkoenigClient.OpeningPeriod("Mo-Fr", "06:00", "22:00"), hours.periods().getFirst());
+        assertEquals("Sonntag geschlossen", hours.exceptions().getFirst());
+        assertEquals(hours, client.openingHours(id));
         assertEquals(2, requests.get());
     }
 
